@@ -1,0 +1,10 @@
+vue/node_modules
+vue/dist
+/.github/
+/release/
+/.idea/
+/.vscode/
+/.DS_Store
+*.dot
+*.log
+*.ign
