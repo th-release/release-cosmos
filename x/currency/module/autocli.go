@@ -17,6 +17,18 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					Use:       "params",
 					Short:     "Shows the parameters of the module",
 				},
+				{
+					RpcMethod: "ListToken",
+					Use:       "list-token",
+					Short:     "List all Token",
+				},
+				{
+					RpcMethod:      "GetToken",
+					Use:            "get-token [id]",
+					Short:          "Gets a Token",
+					Alias:          []string{"show-token"},
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "denom"}},
+				},
 				// this line is used by ignite scaffolding # autocli/query
 			},
 		},
@@ -27,6 +39,24 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 				{
 					RpcMethod: "UpdateParams",
 					Skip:      true, // skipped because authority gated
+				},
+				{
+					RpcMethod:      "CreateToken",
+					Use:            "create-token [denom] [name] [symbol] [metadata-url] [total-supply] [supply] [decimals] [initial-price]",
+					Short:          "Create a new Token",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "denom"}, {ProtoField: "name"}, {ProtoField: "symbol"}, {ProtoField: "metadata_url"}, {ProtoField: "total_supply"}, {ProtoField: "supply"}, {ProtoField: "decimals"}, {ProtoField: "initial_price"}},
+				},
+				{
+					RpcMethod:      "UpdateToken",
+					Use:            "update-token [denom] [name] [symbol] [metadata-url] [total-supply] [supply] [decimals] [initial-price]",
+					Short:          "Update Token",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "denom"}, {ProtoField: "name"}, {ProtoField: "symbol"}, {ProtoField: "metadata_url"}, {ProtoField: "total_supply"}, {ProtoField: "supply"}, {ProtoField: "decimals"}, {ProtoField: "initial_price"}},
+				},
+				{
+					RpcMethod:      "DeleteToken",
+					Use:            "delete-token [denom]",
+					Short:          "Delete Token",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "denom"}},
 				},
 				// this line is used by ignite scaffolding # autocli/tx
 			},

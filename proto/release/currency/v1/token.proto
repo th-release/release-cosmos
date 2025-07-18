@@ -1,0 +1,17 @@
+syntax = "proto3";
+package release.currency.v1;
+
+option go_package = "release/x/currency/types";
+
+// Token defines the Token message.
+message Token {
+  string denom = 1;
+  string name = 2;
+  string symbol = 3;
+  string metadata_url = 4;
+  int64 total_supply = 5;
+  int64 supply = 6;
+  int64 decimals = 7;
+  int64 initial_price = 8;
+  string owner = 9;
+}
