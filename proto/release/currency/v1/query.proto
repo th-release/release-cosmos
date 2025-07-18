@@ -27,6 +27,11 @@ service Query {
   rpc ListToken(QueryAllTokenRequest) returns (QueryAllTokenResponse) {
     option (google.api.http).get = "/release/currency/v1/token";
   }
+
+  // TokenAmount Queries a list of TokenAmount items.
+  rpc TokenAmount(QueryTokenAmountRequest) returns (QueryTokenAmountResponse) {
+    option (google.api.http).get = "/release/currency/v1/token_amount/{denom}/{address}";
+  }
 }
 
 // QueryParamsRequest is request type for the Query/Params RPC method.
@@ -60,4 +65,15 @@ message QueryAllTokenRequest {
 message QueryAllTokenResponse {
   repeated Token token = 1 [(gogoproto.nullable) = false];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryTokenAmountRequest defines the QueryTokenAmountRequest message.
+message QueryTokenAmountRequest {
+  string denom = 1;
+  string address = 2;
+}
+
+// QueryTokenAmountResponse defines the QueryTokenAmountResponse message.
+message QueryTokenAmountResponse {
+  int64 amount = 1;
 }
