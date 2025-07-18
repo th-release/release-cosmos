@@ -1,4 +1,5 @@
 syntax = "proto3";
+
 package release.currency.v1;
 
 import "amino/amino.proto";
@@ -6,6 +7,7 @@ import "cosmos/base/query/v1beta1/pagination.proto";
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "release/currency/v1/params.proto";
+import "release/currency/v1/token.proto";
 
 option go_package = "release/x/currency/types";
 
@@ -14,6 +16,21 @@ service Query {
   // Parameters queries the parameters of the module.
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/release/currency/v1/params";
+  }
+
+  // ListToken Queries a list of Token items.
+  rpc GetToken(QueryGetTokenRequest) returns (QueryGetTokenResponse) {
+    option (google.api.http).get = "/release/currency/v1/token/{denom}";
+  }
+
+  // ListToken defines the ListToken RPC.
+  rpc ListToken(QueryAllTokenRequest) returns (QueryAllTokenResponse) {
+    option (google.api.http).get = "/release/currency/v1/token";
+  }
+
+  // TokenAmount Queries a list of TokenAmount items.
+  rpc TokenAmount(QueryTokenAmountRequest) returns (QueryTokenAmountResponse) {
+    option (google.api.http).get = "/release/currency/v1/token_amount/{denom}/{address}";
   }
 }
 
@@ -27,4 +44,36 @@ message QueryParamsResponse {
     (gogoproto.nullable) = false,
     (amino.dont_omitempty) = true
   ];
+}
+
+// QueryGetTokenRequest defines the QueryGetTokenRequest message.
+message QueryGetTokenRequest {
+  string denom = 1;
+}
+
+// QueryGetTokenResponse defines the QueryGetTokenResponse message.
+message QueryGetTokenResponse {
+  Token token = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryAllTokenRequest defines the QueryAllTokenRequest message.
+message QueryAllTokenRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryAllTokenResponse defines the QueryAllTokenResponse message.
+message QueryAllTokenResponse {
+  repeated Token token = 1 [(gogoproto.nullable) = false];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryTokenAmountRequest defines the QueryTokenAmountRequest message.
+message QueryTokenAmountRequest {
+  string denom = 1;
+  string address = 2;
+}
+
+// QueryTokenAmountResponse defines the QueryTokenAmountResponse message.
+message QueryTokenAmountResponse {
+  int64 amount = 1;
 }

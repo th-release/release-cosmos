@@ -1,9 +1,11 @@
 syntax = "proto3";
+
 package release.currency.v1;
 
 import "amino/amino.proto";
 import "gogoproto/gogo.proto";
 import "release/currency/v1/params.proto";
+import "release/currency/v1/token.proto";
 
 option go_package = "release/x/currency/types";
 
@@ -14,4 +16,5 @@ message GenesisState {
     (gogoproto.nullable) = false,
     (amino.dont_omitempty) = true
   ];
+  repeated Token token_map = 2 [(gogoproto.nullable) = false];
 }
