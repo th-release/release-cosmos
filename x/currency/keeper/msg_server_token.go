@@ -82,30 +82,3 @@ func (k msgServer) UpdateToken(ctx context.Context, msg *types.MsgUpdateToken) (
 
 	return &types.MsgUpdateTokenResponse{}, nil
 }
-
-func (k msgServer) DeleteToken(ctx context.Context, msg *types.MsgDeleteToken) (*types.MsgDeleteTokenResponse, error) {
-	if _, err := k.addressCodec.StringToBytes(msg.Owner); err != nil {
-		return nil, errorsmod.Wrap(sdkerrors.ErrInvalidAddress, fmt.Sprintf("invalid signer address: %s", err))
-	}
-
-	// Check if the value exists
-	val, err := k.Token.Get(ctx, msg.Denom)
-	if err != nil {
-		if errors.Is(err, collections.ErrNotFound) {
-			return nil, errorsmod.Wrap(sdkerrors.ErrKeyNotFound, "index not set")
-		}
-
-		return nil, errorsmod.Wrap(sdkerrors.ErrLogic, err.Error())
-	}
-
-	// Checks if the msg owner is the same as the current owner
-	if msg.Owner != val.Owner {
-		return nil, errorsmod.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
-	}
-
-	if err := k.Token.Remove(ctx, msg.Denom); err != nil {
-		return nil, errorsmod.Wrap(sdkerrors.ErrLogic, "failed to remove token")
-	}
-
-	return &types.MsgDeleteTokenResponse{}, nil
-}

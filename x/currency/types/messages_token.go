@@ -49,14 +49,3 @@ func NewMsgUpdateToken(
 		InitialPrice: initialPrice,
 	}
 }
-
-func NewMsgDeleteToken(
-	owner string,
-	denom string,
-
-) *MsgDeleteToken {
-	return &MsgDeleteToken{
-		Owner: owner,
-		Denom: denom,
-	}
-}

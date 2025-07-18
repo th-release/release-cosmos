@@ -52,12 +52,6 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					Short:          "Update Token",
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "denom"}, {ProtoField: "name"}, {ProtoField: "symbol"}, {ProtoField: "metadata_url"}, {ProtoField: "total_supply"}, {ProtoField: "supply"}, {ProtoField: "decimals"}, {ProtoField: "initial_price"}},
 				},
-				{
-					RpcMethod:      "DeleteToken",
-					Use:            "delete-token [denom]",
-					Short:          "Delete Token",
-					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "denom"}},
-				},
 				// this line is used by ignite scaffolding # autocli/tx
 			},
 		},

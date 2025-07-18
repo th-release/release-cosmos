@@ -23,9 +23,6 @@ service Msg {
 
   // UpdateToken defines the UpdateToken RPC.
   rpc UpdateToken(MsgUpdateToken) returns (MsgUpdateTokenResponse);
-
-  // DeleteToken defines the DeleteToken RPC.
-  rpc DeleteToken(MsgDeleteToken) returns (MsgDeleteTokenResponse);
 }
 
 // MsgUpdateParams is the Msg/UpdateParams request type.
@@ -83,12 +80,3 @@ message MsgUpdateToken {
 // MsgUpdateTokenResponse defines the MsgUpdateTokenResponse message.
 message MsgUpdateTokenResponse {}
 
-// MsgDeleteToken defines the MsgDeleteToken message.
-message MsgDeleteToken {
-  option (cosmos.msg.v1.signer) = "owner";
-  string owner = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
-  string denom = 2;
-}
-
-// MsgDeleteTokenResponse defines the MsgDeleteTokenResponse message.
-message MsgDeleteTokenResponse {}

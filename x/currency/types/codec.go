@@ -10,7 +10,6 @@ func RegisterInterfaces(registrar codectypes.InterfaceRegistry) {
 	registrar.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgCreateToken{},
 		&MsgUpdateToken{},
-		&MsgDeleteToken{},
 	)
 
 	registrar.RegisterImplementations((*sdk.Msg)(nil),
