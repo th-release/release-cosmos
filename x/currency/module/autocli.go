@@ -58,6 +58,18 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					Short:          "Send a mint-token tx",
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "denom"}, {ProtoField: "amount"}, {ProtoField: "to"}},
 				},
+				{
+					RpcMethod:      "BurnToken",
+					Use:            "burn-token [denom] [amount] [from]",
+					Short:          "Send a BurnToken tx",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "denom"}, {ProtoField: "amount"}, {ProtoField: "from"}},
+				},
+				{
+					RpcMethod:      "TransferToken",
+					Use:            "transfer-token [denom] [amount] [from] [to]",
+					Short:          "Send a TransferToken tx",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "denom"}, {ProtoField: "amount"}, {ProtoField: "from"}, {ProtoField: "to"}},
+				},
 				// this line is used by ignite scaffolding # autocli/tx
 			},
 		},
