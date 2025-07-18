@@ -1,0 +1,17 @@
+syntax = "proto3";
+package release.currency.v1;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+import "release/currency/v1/params.proto";
+
+option go_package = "release/x/currency/types";
+
+// GenesisState defines the currency module's genesis state.
+message GenesisState {
+  // params defines all the parameters of the module.
+  Params params = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}

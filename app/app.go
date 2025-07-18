@@ -46,6 +46,7 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v10/modules/core/keeper"
 
 	"release/docs"
+	currencymodulekeeper "release/x/currency/keeper"
 )
 
 const (
@@ -97,6 +98,7 @@ type App struct {
 	ICAHostKeeper       icahostkeeper.Keeper
 	TransferKeeper      ibctransferkeeper.Keeper
 
+	CurrencyKeeper currencymodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// simulation manager
@@ -176,6 +178,7 @@ func New(
 		&app.ConsensusParamsKeeper,
 		&app.CircuitBreakerKeeper,
 		&app.ParamsKeeper,
+		&app.CurrencyKeeper,
 	); err != nil {
 		panic(err)
 	}
