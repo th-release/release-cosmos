@@ -1,0 +1,11 @@
+syntax = "proto3";
+package release.storage.v1;
+
+option go_package = "release/x/storage/types";
+
+// Storage defines the Storage message.
+message Storage {
+  string denom = 1;
+  string data = 2;
+  string owner = 3;
+}

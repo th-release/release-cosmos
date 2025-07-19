@@ -47,6 +47,7 @@ import (
 
 	"release/docs"
 	currencymodulekeeper "release/x/currency/keeper"
+	storagemodulekeeper "release/x/storage/keeper"
 )
 
 const (
@@ -99,6 +100,7 @@ type App struct {
 	TransferKeeper      ibctransferkeeper.Keeper
 
 	CurrencyKeeper currencymodulekeeper.Keeper
+	StorageKeeper  storagemodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// simulation manager
@@ -179,6 +181,7 @@ func New(
 		&app.CircuitBreakerKeeper,
 		&app.ParamsKeeper,
 		&app.CurrencyKeeper,
+		&app.StorageKeeper,
 	); err != nil {
 		panic(err)
 	}
