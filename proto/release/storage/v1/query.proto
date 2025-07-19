@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+package release.storage.v1;
+
+import "amino/amino.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "release/storage/v1/params.proto";
+import "release/storage/v1/storage.proto";
+
+option go_package = "release/x/storage/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  // Parameters queries the parameters of the module.
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/release/storage/v1/params";
+  }
+
+  // ListStorage Queries a list of Storage items.
+  rpc GetStorage(QueryGetStorageRequest) returns (QueryGetStorageResponse) {
+    option (google.api.http).get = "/release/storage/v1/storage/{denom}";
+  }
+
+  // ListStorage defines the ListStorage RPC.
+  rpc ListStorage(QueryAllStorageRequest) returns (QueryAllStorageResponse) {
+    option (google.api.http).get = "/release/storage/v1/storage";
+  }
+
+  // Data Queries a list of Data items.
+  rpc Data(QueryDataRequest) returns (QueryDataResponse) {
+    option (google.api.http).get = "/release/storage/v1/data/{denom}/{key}";
+  }
+}
+
+// QueryParamsRequest is request type for the Query/Params RPC method.
+message QueryParamsRequest {}
+
+// QueryParamsResponse is response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  // params holds all the parameters of this module.
+  Params params = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}
+
+// QueryGetStorageRequest defines the QueryGetStorageRequest message.
+message QueryGetStorageRequest {
+  string denom = 1;
+}
+
+// QueryGetStorageResponse defines the QueryGetStorageResponse message.
+message QueryGetStorageResponse {
+  Storage storage = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryAllStorageRequest defines the QueryAllStorageRequest message.
+message QueryAllStorageRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryAllStorageResponse defines the QueryAllStorageResponse message.
+message QueryAllStorageResponse {
+  repeated Storage storage = 1 [(gogoproto.nullable) = false];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryDataRequest defines the QueryDataRequest message.
+message QueryDataRequest {
+  string denom = 1;
+  string key = 2;
+}
+
+// QueryDataResponse defines the QueryDataResponse message.
+message QueryDataResponse {
+  string value = 1;
+}

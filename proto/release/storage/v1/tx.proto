@@ -1,0 +1,126 @@
+syntax = "proto3";
+
+package release.storage.v1;
+
+import "amino/amino.proto";
+import "cosmos/msg/v1/msg.proto";
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "release/storage/v1/params.proto";
+
+option go_package = "release/x/storage/types";
+
+// Msg defines the Msg service.
+service Msg {
+  option (cosmos.msg.v1.service) = true;
+
+  // UpdateParams defines a (governance) operation for updating the module
+  // parameters. The authority defaults to the x/gov module account.
+  rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
+
+  // CreateStorage defines the CreateStorage RPC.
+  rpc CreateStorage(MsgCreateStorage) returns (MsgCreateStorageResponse);
+
+  // UpdateStorage defines the UpdateStorage RPC.
+  rpc UpdateStorage(MsgUpdateStorage) returns (MsgUpdateStorageResponse);
+
+  // DeleteStorage defines the DeleteStorage RPC.
+  rpc DeleteStorage(MsgDeleteStorage) returns (MsgDeleteStorageResponse);
+
+  // CreateData defines the CreateData RPC.
+  rpc CreateData(MsgCreateData) returns (MsgCreateDataResponse);
+
+  // UpdateData defines the UpdateData RPC.
+  rpc UpdateData(MsgUpdateData) returns (MsgUpdateDataResponse);
+
+  // DeleteData defines the DeleteData RPC.
+  rpc DeleteData(MsgDeleteData) returns (MsgDeleteDataResponse);
+}
+
+// MsgUpdateParams is the Msg/UpdateParams request type.
+message MsgUpdateParams {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (amino.name) = "release/x/storage/MsgUpdateParams";
+
+  // authority is the address that controls the module (defaults to x/gov unless overwritten).
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+
+  // params defines the module parameters to update.
+
+  // NOTE: All parameters must be supplied.
+  Params params = 2 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}
+
+// MsgUpdateParamsResponse defines the response structure for executing a
+// MsgUpdateParams message.
+message MsgUpdateParamsResponse {}
+
+// MsgCreateStorage defines the MsgCreateStorage message.
+message MsgCreateStorage {
+  option (cosmos.msg.v1.signer) = "owner";
+  string owner = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string denom = 2;
+  string data = 3;
+}
+
+// MsgCreateStorageResponse defines the MsgCreateStorageResponse message.
+message MsgCreateStorageResponse {}
+
+// MsgUpdateStorage defines the MsgUpdateStorage message.
+message MsgUpdateStorage {
+  option (cosmos.msg.v1.signer) = "owner";
+  string owner = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string denom = 2;
+  string data = 3;
+}
+
+// MsgUpdateStorageResponse defines the MsgUpdateStorageResponse message.
+message MsgUpdateStorageResponse {}
+
+// MsgDeleteStorage defines the MsgDeleteStorage message.
+message MsgDeleteStorage {
+  option (cosmos.msg.v1.signer) = "owner";
+  string owner = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string denom = 2;
+}
+
+// MsgDeleteStorageResponse defines the MsgDeleteStorageResponse message.
+message MsgDeleteStorageResponse {}
+
+// MsgCreateData defines the MsgCreateData message.
+message MsgCreateData {
+  option (cosmos.msg.v1.signer) = "owner";
+  string owner = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string denom = 2;
+  string key = 3;
+  string value = 4;
+}
+
+// MsgCreateDataResponse defines the MsgCreateDataResponse message.
+message MsgCreateDataResponse {}
+
+// MsgUpdateData defines the MsgUpdateData message.
+message MsgUpdateData {
+  option (cosmos.msg.v1.signer) = "owner";
+  string owner = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string denom = 2;
+  string key = 3;
+  string value = 4;
+}
+
+// MsgUpdateDataResponse defines the MsgUpdateDataResponse message.
+message MsgUpdateDataResponse {}
+
+// MsgDeleteData defines the MsgDeleteData message.
+message MsgDeleteData {
+  option (cosmos.msg.v1.signer) = "owner";
+  string owner = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string denom = 2;
+  string key = 3;
+}
+
+// MsgDeleteDataResponse defines the MsgDeleteDataResponse message.
+message MsgDeleteDataResponse {}

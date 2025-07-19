@@ -3,6 +3,8 @@ package app
 import (
 	_ "release/x/currency/module"
 	currencymoduletypes "release/x/currency/types"
+	_ "release/x/storage/module"
+	storagemoduletypes "release/x/storage/types"
 	"time"
 
 	runtimev1alpha1 "cosmossdk.io/api/cosmos/app/runtime/v1alpha1"
@@ -128,6 +130,7 @@ var (
 						ibcexported.ModuleName,
 						// chain modules
 						currencymoduletypes.ModuleName,
+						storagemoduletypes.ModuleName,
 						// this line is used by starport scaffolding # stargate/app/beginBlockers
 					},
 					EndBlockers: []string{
@@ -137,6 +140,7 @@ var (
 						group.ModuleName,
 						// chain modules
 						currencymoduletypes.ModuleName,
+						storagemoduletypes.ModuleName,
 						// this line is used by starport scaffolding # stargate/app/endBlockers
 					},
 					// The following is mostly only needed when ModuleName != StoreKey name.
@@ -174,6 +178,7 @@ var (
 						icatypes.ModuleName,
 						// chain modules
 						currencymoduletypes.ModuleName,
+						storagemoduletypes.ModuleName,
 						// this line is used by starport scaffolding # stargate/app/initGenesis
 					},
 				}),
@@ -273,6 +278,10 @@ var (
 			{
 				Name:   currencymoduletypes.ModuleName,
 				Config: appconfig.WrapAny(&currencymoduletypes.Module{}),
+			},
+			{
+				Name:   storagemoduletypes.ModuleName,
+				Config: appconfig.WrapAny(&storagemoduletypes.Module{}),
 			},
 			// this line is used by starport scaffolding # stargate/app/moduleConfig
 		},
