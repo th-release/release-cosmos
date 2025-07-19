@@ -2,10 +2,14 @@ package keeper
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 
 	"release/x/storage/types"
 
+	"cosmossdk.io/collections"
 	errorsmod "cosmossdk.io/errors"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 func (k msgServer) CreateData(ctx context.Context, msg *types.MsgCreateData) (*types.MsgCreateDataResponse, error) {
@@ -13,7 +17,46 @@ func (k msgServer) CreateData(ctx context.Context, msg *types.MsgCreateData) (*t
 		return nil, errorsmod.Wrap(err, "invalid authority address")
 	}
 
-	// TODO: Handle the message
+	var jsonData map[string]string
+
+	val, err := k.Storage.Get(ctx, msg.Denom)
+	if err != nil {
+		if errors.Is(err, collections.ErrNotFound) {
+			return nil, errorsmod.Wrap(sdkerrors.ErrKeyNotFound, "Denom not found")
+		}
+
+		return nil, errorsmod.Wrap(sdkerrors.ErrLogic, err.Error())
+	}
+
+	if msg.Owner != val.Owner {
+		return nil, errorsmod.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
+	}
+
+	err = json.Unmarshal([]byte(val.Data), &jsonData)
+	if err != nil {
+		jsonData = make(map[string]string)
+	}
+
+	if len(jsonData[msg.Key]) != 0 {
+		return nil, errorsmod.Wrap(sdkerrors.ErrUnauthorized, "already existing Data")
+	}
+
+	jsonData[msg.Key] = msg.Value
+
+	result, err := json.Marshal(jsonData)
+	if err != nil {
+		return nil, errorsmod.Wrap(sdkerrors.ErrUnauthorized, "Json conversion failed")
+	}
+
+	var storage = types.Storage{
+		Owner: msg.Owner,
+		Denom: msg.Denom,
+		Data:  string(result),
+	}
+
+	if err := k.Storage.Set(ctx, storage.Denom, storage); err != nil {
+		return nil, errorsmod.Wrap(sdkerrors.ErrLogic, "failed to update storage")
+	}
 
 	return &types.MsgCreateDataResponse{}, nil
 }
