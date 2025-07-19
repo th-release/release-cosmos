@@ -27,6 +27,11 @@ service Query {
   rpc ListStorage(QueryAllStorageRequest) returns (QueryAllStorageResponse) {
     option (google.api.http).get = "/release/storage/v1/storage";
   }
+
+  // Data Queries a list of Data items.
+  rpc Data(QueryDataRequest) returns (QueryDataResponse) {
+    option (google.api.http).get = "/release/storage/v1/data/{denom}/{key}";
+  }
 }
 
 // QueryParamsRequest is request type for the Query/Params RPC method.
@@ -60,4 +65,15 @@ message QueryAllStorageRequest {
 message QueryAllStorageResponse {
   repeated Storage storage = 1 [(gogoproto.nullable) = false];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryDataRequest defines the QueryDataRequest message.
+message QueryDataRequest {
+  string denom = 1;
+  string key = 2;
+}
+
+// QueryDataResponse defines the QueryDataResponse message.
+message QueryDataResponse {
+  string value = 1;
 }

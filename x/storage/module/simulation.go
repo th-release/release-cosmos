@@ -79,6 +79,51 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 		weightMsgDeleteStorage,
 		storagesimulation.SimulateMsgDeleteStorage(am.authKeeper, am.bankKeeper, am.keeper, simState.TxConfig),
 	))
+	const (
+		opWeightMsgCreateData          = "op_weight_msg_storage"
+		defaultWeightMsgCreateData int = 100
+	)
+
+	var weightMsgCreateData int
+	simState.AppParams.GetOrGenerate(opWeightMsgCreateData, &weightMsgCreateData, nil,
+		func(_ *rand.Rand) {
+			weightMsgCreateData = defaultWeightMsgCreateData
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgCreateData,
+		storagesimulation.SimulateMsgCreateData(am.authKeeper, am.bankKeeper, am.keeper, simState.TxConfig),
+	))
+	const (
+		opWeightMsgUpdateData          = "op_weight_msg_storage"
+		defaultWeightMsgUpdateData int = 100
+	)
+
+	var weightMsgUpdateData int
+	simState.AppParams.GetOrGenerate(opWeightMsgUpdateData, &weightMsgUpdateData, nil,
+		func(_ *rand.Rand) {
+			weightMsgUpdateData = defaultWeightMsgUpdateData
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgUpdateData,
+		storagesimulation.SimulateMsgUpdateData(am.authKeeper, am.bankKeeper, am.keeper, simState.TxConfig),
+	))
+	const (
+		opWeightMsgDeleteData          = "op_weight_msg_storage"
+		defaultWeightMsgDeleteData int = 100
+	)
+
+	var weightMsgDeleteData int
+	simState.AppParams.GetOrGenerate(opWeightMsgDeleteData, &weightMsgDeleteData, nil,
+		func(_ *rand.Rand) {
+			weightMsgDeleteData = defaultWeightMsgDeleteData
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgDeleteData,
+		storagesimulation.SimulateMsgDeleteData(am.authKeeper, am.bankKeeper, am.keeper, simState.TxConfig),
+	))
 
 	return operations
 }

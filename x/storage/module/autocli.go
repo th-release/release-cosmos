@@ -29,6 +29,13 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					Alias:          []string{"show-storage"},
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "denom"}},
 				},
+				{
+					RpcMethod:      "Data",
+					Use:            "data [denom] [key]",
+					Short:          "Query data",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "denom"}, {ProtoField: "key"}},
+				},
+
 				// this line is used by ignite scaffolding # autocli/query
 			},
 		},
@@ -57,6 +64,24 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					Use:            "delete-storage [denom]",
 					Short:          "Delete storage",
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "denom"}},
+				},
+				{
+					RpcMethod:      "CreateData",
+					Use:            "create-data [denom] [key] [value]",
+					Short:          "Send a create-data tx",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "denom"}, {ProtoField: "key"}, {ProtoField: "value"}},
+				},
+				{
+					RpcMethod:      "UpdateData",
+					Use:            "update-data [denom] [key] [value]",
+					Short:          "Send a update-data tx",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "denom"}, {ProtoField: "key"}, {ProtoField: "value"}},
+				},
+				{
+					RpcMethod:      "DeleteData",
+					Use:            "delete-data [denom] [key]",
+					Short:          "Send a delete-data tx",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "denom"}, {ProtoField: "key"}},
 				},
 				// this line is used by ignite scaffolding # autocli/tx
 			},
