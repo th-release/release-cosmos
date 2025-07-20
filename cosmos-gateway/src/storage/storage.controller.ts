@@ -89,7 +89,7 @@ export class StorageController {
       })
     })
 
-    this.router.post(`${prefix}/mnemonic/update`, async (req, res) => {
+    this.router.put(`${prefix}/mnemonic/update`, async (req, res) => {
       const { mnemonic, denom, data } = req.body
 
       const wallet = await this.walletService.walletFromMnemonic(mnemonic)
@@ -115,7 +115,7 @@ export class StorageController {
       })
     })
 
-    this.router.post(`${prefix}/privatekey/update`, async (req, res) => {
+    this.router.put(`${prefix}/privatekey/update`, async (req, res) => {
       const { privatekey, denom, data } = req.body
       const wallet = await this.walletService.walletFromPrivateKey(privatekey)
 
