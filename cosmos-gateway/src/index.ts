@@ -20,6 +20,6 @@ app.use(cookieParser());
 console.log("Express Cookie-Parser Success");
 
 app.use(cors())
-console.log("Express Cors Open Success");
+console.log("Express Cors Open Success");  
 
 new App(app);

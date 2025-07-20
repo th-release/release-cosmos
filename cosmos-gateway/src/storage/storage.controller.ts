@@ -13,6 +13,31 @@ export class StorageController {
 
   private initializeRoutes(prefix: string): void {
     this.router.get(`${prefix}`, (req, res) => this.storageService.getStatus(req, res));
+
+    this.router.get(`${prefix}/list`, async(req, res) => {
+      const { offset = "0", limit = "10" } = req.query
+
+      const result = await this.storageService.listStorage({
+        pagination: {
+          key: new Uint8Array(0),
+          offset: +offset,
+          limit: +limit,
+          countTotal: true,
+          reverse: false,
+        }
+      })
+
+      return res.status(200).json(result)
+    });
+
+    this.router.get(`${prefix}/detail/:denon`, async (req, res) => {
+      const result = await this.storageService.detailStorage({
+        denom: req.params.denon
+      })
+
+      return res.status(200).json(result)
+    });
+
     this.router.post(`${prefix}/mnemonic/create`, async (req, res) => {
       const { mnemonic, denom, data } = req.body
 
@@ -28,7 +53,15 @@ export class StorageController {
         return res.status(500).json(result)
       }
 
-      return res.status(201).json(result)
+      return res.status(201).json({
+        success: result.success,
+        response: result.result.msgResponses,
+        gasUsed: result.result.gasUsed.toString(),
+        gasWanted: result.result.gasWanted.toString(),
+        height: result.result.height.toString(),
+        txHash: result.result.transactionHash,
+        txIndex: result.result.txIndex,
+      })
     })
 
     this.router.post(`${prefix}/privatekey/create`, async (req, res) => {

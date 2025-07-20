@@ -1,8 +1,11 @@
-import { DirectSecp256k1HdWallet, DirectSecp256k1Wallet, GeneratedType, Registry } from "@cosmjs/proto-signing";
-import { GasPrice, SigningStargateClient } from "@cosmjs/stargate";
+import { DirectSecp256k1HdWallet, DirectSecp256k1Wallet, Registry } from "@cosmjs/proto-signing";
+import { createProtobufRpcClient, GasPrice, ProtobufRpcClient, QueryClient, SigningStargateClient, StargateClient } from "@cosmjs/stargate";
+import { Tendermint34Client } from "@cosmjs/tendermint-rpc";
 import { Request, Response } from "express";
+import * as storage from "src/proto/release/storage/v1/query";
+import { Storage } from "src/proto/release/storage/v1/storage";
 import { MsgCreateData, MsgCreateStorage, MsgDeleteData, MsgDeleteStorage, MsgUpdateData, MsgUpdateStorage } from "src/proto/release/storage/v1/tx";
-import { createBufRegistry, createSchemaGeneratedType } from "src/utils/message";
+import { createBufRegistry } from "src/utils/message";
 
 
 export class StorageService {
@@ -13,8 +16,9 @@ export class StorageService {
       ['/release.storage.v1.MsgDeleteStorage', MsgDeleteStorage],
       ['/release.storage.v1.MsgCreateData', MsgCreateData],
       ['/release.storage.v1.MsgUpdateData', MsgUpdateData],
-      ['/release.storage.v1.MsgDeleteData', MsgDeleteData]
-  ]
+      ['/release.storage.v1.MsgDeleteData', MsgDeleteData],
+      ['/release.storage.v1.Storage', Storage],
+    ]
   )
   
   public getStatus(req: Request, res: Response): Response<any, Record<string, any>> {
@@ -22,6 +26,61 @@ export class StorageService {
       status: true,
       internetProtocol: req.ip
     });
+  }
+
+  private async getQueryclient(): Promise<QueryClient> {
+    const tmClient = await Tendermint34Client.connect(process.env.RPC_ENDPOINT || "http://localhost:26657");
+    return new QueryClient(tmClient);
+  }
+
+  private async getProtobufRpcClient(): Promise<ProtobufRpcClient> {
+    return createProtobufRpcClient(await this.getQueryclient());
+  }
+
+  private async getStargateClient(): Promise<StargateClient> {
+    return await StargateClient.connect(process.env.RPC_ENDPOINT || "http://localhost:26657");
+  }
+
+
+  public async listStorage(req: storage.QueryAllStorageRequest) {
+    try {
+      const client = await this.getProtobufRpcClient();
+
+      const queryStroage = new storage.QueryClientImpl(client)
+
+      return {
+        success: true,
+        data: {
+          storage: await queryStroage.ListStorage(req)
+        }
+      };
+    } catch (e) {
+      console.log(e)
+      return {
+        success: false,
+        error: e
+      };
+    }
+  }
+
+  public async detailStorage(req: storage.QueryGetStorageRequest) {
+    try {
+      const client = await this.getProtobufRpcClient();
+
+      const queryStroage = new storage.QueryClientImpl(client)
+
+      return {
+        success: true,
+        data: {
+          storage: await queryStroage.GetStorage(req)
+        }
+      };
+    } catch (e) {
+      return {
+        success: false,
+        error: e
+      };
+    }
   }
 
   public async createStorage(wallet: DirectSecp256k1HdWallet | DirectSecp256k1Wallet, denom: string, data: string = '{}') {
