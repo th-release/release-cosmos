@@ -8,3 +8,7 @@ vue/dist
 *.dot
 *.log
 *.ign
+dist/
+node_modules/
+.env
+yarn-error.log
