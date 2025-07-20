@@ -136,4 +136,58 @@ export class StorageService {
       }
     }
   }
+
+  public async updateStorage(wallet: DirectSecp256k1HdWallet | DirectSecp256k1Wallet, denom: string, data: string = '{}') {
+    let dataformat = {}
+    try {
+      dataformat = JSON.parse(data)
+    } catch (e) {
+      return {
+        success: false,
+        error: e
+      }
+    }
+
+    if (!wallet || (!denom || denom.length == 0)) {
+      return {
+        success: false,
+        error: "wallet, denom is required"
+      }
+    }
+    
+    try {
+      const [w] = await wallet.getAccounts()
+
+      const client = await SigningStargateClient.connectWithSigner(
+        process.env.RPC_ENDPOINT,
+        wallet,
+        { gasPrice: GasPrice.fromString(process.env.GAS_FEE), registry: this.reigstry }
+      );
+
+      const createStorageMsg = {
+        typeUrl: '/release.storage.v1.MsgUpdateStorage',
+        value: {
+            owner: w.address,
+            denom: denom,
+            data: data
+        }
+      };
+      
+      const result = await client.signAndBroadcast(
+        w.address,
+        [createStorageMsg],
+        'auto',
+        'Update storage'
+      );
+
+      client.disconnect();
+      return {success: true, result};
+    } catch (e) {
+      console.log(e)
+      return {
+        success: false,
+        error: e
+      }
+    }
+  }
 }

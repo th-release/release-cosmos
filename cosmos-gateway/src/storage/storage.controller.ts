@@ -88,6 +88,57 @@ export class StorageController {
         txIndex: result.result.txIndex,
       })
     })
+
+    this.router.post(`${prefix}/mnemonic/update`, async (req, res) => {
+      const { mnemonic, denom, data } = req.body
+
+      const wallet = await this.walletService.walletFromMnemonic(mnemonic)
+
+      if (!wallet.success) {
+        return res.status(500).json(wallet)
+      }
+
+      const result = await this.storageService.updateStorage(wallet.wallet, denom, data)
+
+      if (!result.success) {
+        return res.status(500).json(result)
+      }
+
+      return res.status(201).json({
+        success: result.success,
+        response: result.result.msgResponses,
+        gasUsed: result.result.gasUsed.toString(),
+        gasWanted: result.result.gasWanted.toString(),
+        height: result.result.height.toString(),
+        txHash: result.result.transactionHash,
+        txIndex: result.result.txIndex,
+      })
+    })
+
+    this.router.post(`${prefix}/privatekey/update`, async (req, res) => {
+      const { privatekey, denom, data } = req.body
+      const wallet = await this.walletService.walletFromPrivateKey(privatekey)
+
+      if (!wallet.success) {
+        return res.status(500).json(wallet)
+      }
+
+      const result = await this.storageService.updateStorage(wallet.wallet, denom, data)
+
+      if (!result.success) {
+        return res.status(500).json(result)
+      }
+
+      return res.status(201).json({
+        success: result.success,
+        response: result.result.msgResponses,
+        gasUsed: result.result.gasUsed.toString(),
+        gasWanted: result.result.gasWanted.toString(),
+        height: result.result.height.toString(),
+        txHash: result.result.transactionHash,
+        txIndex: result.result.txIndex,
+      })
+    })
   }
 
   public getRouter(): Router {
