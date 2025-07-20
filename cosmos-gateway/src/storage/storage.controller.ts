@@ -141,7 +141,7 @@ export class StorageController {
     })
 
     this.router.delete(`${prefix}/mnemonic/delete`, async (req, res) => {
-      const { mnemonic, denom, data } = req.body
+      const { mnemonic, denom } = req.body
 
       const wallet = await this.walletService.walletFromMnemonic(mnemonic)
 
@@ -149,7 +149,7 @@ export class StorageController {
         return res.status(500).json(wallet)
       }
 
-      const result = await this.storageService.updateStorage(wallet.wallet, denom, data)
+      const result = await this.storageService.deleteStorage(wallet.wallet, denom)
 
       if (!result.success) {
         return res.status(500).json(result)
@@ -167,14 +167,14 @@ export class StorageController {
     })
 
     this.router.delete(`${prefix}/privatekey/delete`, async (req, res) => {
-      const { privatekey, denom, data } = req.body
+      const { privatekey, denom } = req.body
       const wallet = await this.walletService.walletFromPrivateKey(privatekey)
 
       if (!wallet.success) {
         return res.status(500).json(wallet)
       }
 
-      const result = await this.storageService.updateStorage(wallet.wallet, denom, data)
+      const result = await this.storageService.deleteStorage(wallet.wallet, denom)
 
       if (!result.success) {
         return res.status(500).json(result)
