@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"release/utils"
 	"release/x/storage/types"
 
 	"cosmossdk.io/collections"
@@ -17,8 +18,10 @@ func (k msgServer) CreateStorage(ctx context.Context, msg *types.MsgCreateStorag
 		return nil, errorsmod.Wrap(sdkerrors.ErrInvalidAddress, fmt.Sprintf("invalid address: %s", err))
 	}
 
+	encrypt_denom := utils.HashStringWithSalt(msg.Denom, utils.GenerateShortUUID())
+
 	// Check if the value already exists
-	ok, err := k.Storage.Has(ctx, msg.Denom)
+	ok, err := k.Storage.Has(ctx, encrypt_denom)
 	if err != nil {
 		return nil, errorsmod.Wrap(sdkerrors.ErrLogic, err.Error())
 	} else if ok {
@@ -27,7 +30,7 @@ func (k msgServer) CreateStorage(ctx context.Context, msg *types.MsgCreateStorag
 
 	var storage = types.Storage{
 		Owner: msg.Owner,
-		Denom: msg.Denom,
+		Denom: encrypt_denom,
 		Data:  msg.Data,
 	}
 

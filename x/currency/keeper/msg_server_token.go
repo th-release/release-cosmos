@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"release/utils"
 	"release/x/currency/types"
 
 	"cosmossdk.io/collections"
@@ -17,8 +18,10 @@ func (k msgServer) CreateToken(ctx context.Context, msg *types.MsgCreateToken) (
 		return nil, errorsmod.Wrap(sdkerrors.ErrInvalidAddress, fmt.Sprintf("invalid address: %s", err))
 	}
 
+	encrypt_denom := utils.HashStringWithSalt(msg.Denom, utils.GenerateShortUUID())
+
 	// Check if the value already exists
-	ok, err := k.Token.Has(ctx, msg.Denom)
+	ok, err := k.Token.Has(ctx, encrypt_denom)
 	if err != nil {
 		return nil, errorsmod.Wrap(sdkerrors.ErrLogic, err.Error())
 	} else if ok {
@@ -27,7 +30,7 @@ func (k msgServer) CreateToken(ctx context.Context, msg *types.MsgCreateToken) (
 
 	var token = types.Token{
 		Owner:        msg.Owner,
-		Denom:        msg.Denom,
+		Denom:        encrypt_denom,
 		Name:         msg.Name,
 		Symbol:       msg.Symbol,
 		MetadataUrl:  msg.MetadataUrl,
