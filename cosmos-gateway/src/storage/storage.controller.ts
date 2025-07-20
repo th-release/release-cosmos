@@ -255,7 +255,11 @@ export class StorageController {
       })
 
       if (data.success) {
-        return res.status(500).json(data)
+        return res.status(500).json({
+          ...data,
+          success: false,
+          error: "duplicate data"
+        })
       }
       
       const result = await this.storageService.createData(wallet.wallet, denom, key, value)
@@ -335,7 +339,7 @@ export class StorageController {
 
     this.router.delete(`${prefix}/mnemonic/data/:denom/delete`, async (req, res) => {
       const { denom } = req.params
-      const { mnemonic, key, value } = req.body
+      const { mnemonic, key } = req.body
 
       const wallet = await this.walletService.walletFromMnemonic(mnemonic)
 
@@ -366,7 +370,7 @@ export class StorageController {
 
     this.router.delete(`${prefix}/privateKey/data/:denom/delete`, async (req, res) => {
       const { denom } = req.params
-      const { privateKey, key, value } = req.body
+      const { privateKey, key } = req.body
 
       const wallet = await this.walletService.walletFromPrivateKey(privateKey)
 
