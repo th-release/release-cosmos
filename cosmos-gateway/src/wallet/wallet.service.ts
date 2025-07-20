@@ -62,6 +62,39 @@ export class WalletService {
     }
   }
 
+  public async walletFromMnemonic(mnemonic: string) {
+    try {
+      const wallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
+        prefix: process.env.ADDRESS_PREFIX
+      });
+
+      return {
+        success: true,
+        wallet
+      }
+    } catch (e) {
+      return {
+        success: false
+      }
+    }
+  }
+
+  public async walletFromPrivateKey(privateKey: string) {
+    try {
+      const privateKeyHex = Buffer.from(privateKey, 'hex');
+      const wallet = await DirectSecp256k1Wallet.fromKey(privateKeyHex, process.env.ADDRESS_PREFIX);
+
+      return {
+        success: true,
+        wallet
+      }
+    } catch (e) {
+      return {
+        success: false
+      }
+    }
+  }
+
   public async restoreMnemonicWallet(mnemonic: string) {
     try {
       if (!mnemonic) {
@@ -71,11 +104,12 @@ export class WalletService {
         }
       }
 
-      const wallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
-        prefix: process.env.ADDRESS_PREFIX
-      });
+      const wallet = await this.walletFromMnemonic(mnemonic)
 
-      const [firstAccount] = await wallet.getAccounts();
+      if (!wallet.success)
+        return wallet
+
+      const [firstAccount] = await wallet.wallet.getAccounts();
 
       return {
         success: true,
@@ -101,10 +135,12 @@ export class WalletService {
         }
       }
 
-      const privateKeyHex = Buffer.from(privateKey, 'hex');
-      const wallet = await DirectSecp256k1Wallet.fromKey(privateKeyHex, process.env.ADDRESS_PREFIX);
+      const wallet = await this.walletFromPrivateKey(privateKey)
 
-      const [firstAccount] = await wallet.getAccounts();
+      if (!wallet.success)
+        return wallet
+
+      const [firstAccount] = await wallet.wallet.getAccounts();
 
       return {
         success: true,
