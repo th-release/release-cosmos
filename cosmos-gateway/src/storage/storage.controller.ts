@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {StorageService} from "./storage.service";
 import { WalletService } from "src/wallet/wallet.service";
+import { QueryDataRequest } from "src/proto/release/storage/v1/query";
 
 export class StorageController {
   private router: Router = Router();
@@ -181,6 +182,209 @@ export class StorageController {
       }
 
       return res.status(201).json({
+        success: result.success,
+        response: result.result.msgResponses,
+        gasUsed: result.result.gasUsed.toString(),
+        gasWanted: result.result.gasWanted.toString(),
+        height: result.result.height.toString(),
+        txHash: result.result.transactionHash,
+        txIndex: result.result.txIndex,
+      })
+    })
+
+    this.router.get(`${prefix}/key/:denom/:key`, async (req, res) => {
+      const { denom, key } = req.params
+
+      const result = await this.storageService.getStorageKey({
+        denom,key
+      })
+
+      if (!result.success) {
+        return res.status(500).json(result)
+      }
+
+      return res.status(200).json({
+        success: result.success,
+        data: result.data.value
+      })
+    })
+
+    this.router.post(`${prefix}/mnemonic/key/:denom/create`, async (req, res) => {
+      const { denom } = req.params
+      const { mnemonic, key, value } = req.body
+
+      const wallet = await this.walletService.walletFromMnemonic(mnemonic)
+
+      if (!wallet.success) {
+        return res.status(500).json(wallet)
+      }
+
+      const data = await this.storageService.getStorageKey({
+        denom,key
+      })
+
+      if (data.success) {
+        return res.status(500).json(data)
+      }
+      
+      const result = await this.storageService.createData(wallet.wallet, denom, key, value)
+
+      return res.status(200).json({
+        success: result.success,
+        response: result.result.msgResponses,
+        gasUsed: result.result.gasUsed.toString(),
+        gasWanted: result.result.gasWanted.toString(),
+        height: result.result.height.toString(),
+        txHash: result.result.transactionHash,
+        txIndex: result.result.txIndex,
+      })
+    })
+
+    this.router.post(`${prefix}/privateKey/key/:denom/create`, async (req, res) => {
+      const { denom } = req.params
+      const { privateKey, key, value } = req.body
+
+      const wallet = await this.walletService.walletFromPrivateKey(privateKey)
+
+      if (!wallet.success) {
+        return res.status(500).json(wallet)
+      }
+
+      const data = await this.storageService.getStorageKey({
+        denom,key
+      })
+
+      if (data.success) {
+        return res.status(500).json(data)
+      }
+      
+      const result = await this.storageService.createData(wallet.wallet, denom, key, value)
+
+      return res.status(200).json({
+        success: result.success,
+        response: result.result.msgResponses,
+        gasUsed: result.result.gasUsed.toString(),
+        gasWanted: result.result.gasWanted.toString(),
+        height: result.result.height.toString(),
+        txHash: result.result.transactionHash,
+        txIndex: result.result.txIndex,
+      })
+    })
+
+    this.router.put(`${prefix}/mnemonic/key/:denom/update`, async (req, res) => {
+      const { denom } = req.params
+      const { mnemonic, key, value } = req.body
+
+      const wallet = await this.walletService.walletFromMnemonic(mnemonic)
+
+      if (!wallet.success) {
+        return res.status(500).json(wallet)
+      }
+
+      const data = await this.storageService.getStorageKey({
+        denom,key
+      })
+
+      if (!data.success) {
+        return res.status(500).json(data)
+      }
+      
+      const result = await this.storageService.updateData(wallet.wallet, denom, key, value)
+
+      return res.status(200).json({
+        success: result.success,
+        response: result.result.msgResponses,
+        gasUsed: result.result.gasUsed.toString(),
+        gasWanted: result.result.gasWanted.toString(),
+        height: result.result.height.toString(),
+        txHash: result.result.transactionHash,
+        txIndex: result.result.txIndex,
+      })
+    })
+
+    this.router.put(`${prefix}/privateKey/key/:denom/update`, async (req, res) => {
+      const { denom } = req.params
+      const { privateKey, key, value } = req.body
+
+      const wallet = await this.walletService.walletFromPrivateKey(privateKey)
+
+      if (!wallet.success) {
+        return res.status(500).json(wallet)
+      }
+
+      const data = await this.storageService.getStorageKey({
+        denom,key
+      })
+
+      if (!data.success) {
+        return res.status(500).json(data)
+      }
+      
+      const result = await this.storageService.updateData(wallet.wallet, denom, key, value)
+
+      return res.status(200).json({
+        success: result.success,
+        response: result.result.msgResponses,
+        gasUsed: result.result.gasUsed.toString(),
+        gasWanted: result.result.gasWanted.toString(),
+        height: result.result.height.toString(),
+        txHash: result.result.transactionHash,
+        txIndex: result.result.txIndex,
+      })
+    })
+
+    this.router.delete(`${prefix}/mnemonic/key/:denom/delete`, async (req, res) => {
+      const { denom } = req.params
+      const { mnemonic, key, value } = req.body
+
+      const wallet = await this.walletService.walletFromMnemonic(mnemonic)
+
+      if (!wallet.success) {
+        return res.status(500).json(wallet)
+      }
+
+      const data = await this.storageService.getStorageKey({
+        denom,key
+      })
+
+      if (!data.success) {
+        return res.status(500).json(data)
+      }
+      
+      const result = await this.storageService.deleteData(wallet.wallet, denom, key)
+
+      return res.status(200).json({
+        success: result.success,
+        response: result.result.msgResponses,
+        gasUsed: result.result.gasUsed.toString(),
+        gasWanted: result.result.gasWanted.toString(),
+        height: result.result.height.toString(),
+        txHash: result.result.transactionHash,
+        txIndex: result.result.txIndex,
+      })
+    })
+
+    this.router.delete(`${prefix}/privateKey/key/:denom/delete`, async (req, res) => {
+      const { denom } = req.params
+      const { privateKey, key, value } = req.body
+
+      const wallet = await this.walletService.walletFromPrivateKey(privateKey)
+
+      if (!wallet.success) {
+        return res.status(500).json(wallet)
+      }
+
+      const data = await this.storageService.getStorageKey({
+        denom,key
+      })
+
+      if (!data.success) {
+        return res.status(500).json(data)
+      }
+      
+      const result = await this.storageService.deleteData(wallet.wallet, denom, key)
+
+      return res.status(200).json({
         success: result.success,
         response: result.result.msgResponses,
         gasUsed: result.result.gasUsed.toString(),
