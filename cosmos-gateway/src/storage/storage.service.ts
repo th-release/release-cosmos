@@ -55,7 +55,6 @@ export class StorageService {
         }
       };
     } catch (e) {
-      console.log(e)
       return {
         success: false,
         error: e
@@ -129,7 +128,6 @@ export class StorageService {
       client.disconnect();
       return {success: true, result};
     } catch (e) {
-      console.log(e)
       return {
         success: false,
         error: e
@@ -164,7 +162,7 @@ export class StorageService {
         { gasPrice: GasPrice.fromString(process.env.GAS_FEE), registry: this.reigstry }
       );
 
-      const createStorageMsg = {
+      const updateStorageMsg = {
         typeUrl: '/release.storage.v1.MsgUpdateStorage',
         value: {
             owner: w.address,
@@ -175,7 +173,7 @@ export class StorageService {
       
       const result = await client.signAndBroadcast(
         w.address,
-        [createStorageMsg],
+        [updateStorageMsg],
         'auto',
         'Update storage'
       );
@@ -183,7 +181,48 @@ export class StorageService {
       client.disconnect();
       return {success: true, result};
     } catch (e) {
-      console.log(e)
+      return {
+        success: false,
+        error: e
+      }
+    }
+  }
+
+  public async deleteStorage(wallet: DirectSecp256k1HdWallet | DirectSecp256k1Wallet, denom: string) {
+    if (!wallet || (!denom || denom.length == 0)) {
+      return {
+        success: false,
+        error: "wallet, denom is required"
+      }
+    }
+    
+    try {
+      const [w] = await wallet.getAccounts()
+
+      const client = await SigningStargateClient.connectWithSigner(
+        process.env.RPC_ENDPOINT,
+        wallet,
+        { gasPrice: GasPrice.fromString(process.env.GAS_FEE), registry: this.reigstry }
+      );
+
+      const deleteStorageMsg = {
+        typeUrl: '/release.storage.v1.MsgDeleteStorage',
+        value: {
+          owner: w.address,
+          denom: denom,
+        }
+      };
+      
+      const result = await client.signAndBroadcast(
+        w.address,
+        [deleteStorageMsg],
+        'auto',
+        'Delete storage'
+      );
+
+      client.disconnect();
+      return {success: true, result};
+    } catch (e) {
       return {
         success: false,
         error: e
