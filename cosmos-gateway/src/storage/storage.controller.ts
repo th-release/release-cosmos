@@ -45,7 +45,15 @@ export class StorageController {
         return res.status(500).json(result)
       }
 
-      return res.status(201).json(result)
+      return res.status(201).json({
+        success: result.success,
+        response: result.result.msgResponses,
+        gasUsed: result.result.gasUsed.toString(),
+        gasWanted: result.result.gasWanted.toString(),
+        height: result.result.height.toString(),
+        txHash: result.result.transactionHash,
+        txIndex: result.result.txIndex,
+      })
     })
   }
 

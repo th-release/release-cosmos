@@ -1,26 +1,19 @@
 import { DirectSecp256k1HdWallet, DirectSecp256k1Wallet, GeneratedType, Registry } from "@cosmjs/proto-signing";
 import { GasPrice, SigningStargateClient } from "@cosmjs/stargate";
 import { Request, Response } from "express";
+import { MsgCreateData, MsgCreateStorage, MsgDeleteData, MsgDeleteStorage, MsgUpdateData, MsgUpdateStorage } from "src/proto/release/storage/v1/tx";
 import { createBufRegistry, createSchemaGeneratedType } from "src/utils/message";
-import {
-  MsgCreateStorageSchema,
-  MsgUpdateStorageSchema,
-  MsgDeleteStorageSchema,
-  MsgCreateDataSchema,
-  MsgUpdateDataSchema,
-  MsgDeleteDataSchema
-} from '../proto/storage/v1/tx_pb'; // 실제 경로로 변경
 
 
 export class StorageService {
   private reigstry: Registry = createBufRegistry(
     [
-      ['/release.storage.v1.MsgCreateStorage', createSchemaGeneratedType(MsgCreateStorageSchema)],
-      ['/release.storage.v1.MsgUpdateStorage', createSchemaGeneratedType(MsgUpdateStorageSchema)],
-      ['/release.storage.v1.MsgDeleteStorage', createSchemaGeneratedType(MsgDeleteStorageSchema)],
-      ['/release.storage.v1.MsgCreateData', createSchemaGeneratedType(MsgCreateDataSchema)],
-      ['/release.storage.v1.MsgUpdateData', createSchemaGeneratedType(MsgUpdateDataSchema)],
-      ['/release.storage.v1.MsgDeleteData', createSchemaGeneratedType(MsgDeleteDataSchema)]
+      ['/release.storage.v1.MsgCreateStorage', MsgCreateStorage],
+      ['/release.storage.v1.MsgUpdateStorage', MsgUpdateStorage],
+      ['/release.storage.v1.MsgDeleteStorage', MsgDeleteStorage],
+      ['/release.storage.v1.MsgCreateData', MsgCreateData],
+      ['/release.storage.v1.MsgUpdateData', MsgUpdateData],
+      ['/release.storage.v1.MsgDeleteData', MsgDeleteData]
   ]
   )
   
