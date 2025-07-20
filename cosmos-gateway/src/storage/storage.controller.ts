@@ -209,7 +209,7 @@ export class StorageController {
       })
     })
 
-    this.router.post(`${prefix}/mnemonic/key/:denom/create`, async (req, res) => {
+    this.router.post(`${prefix}/mnemonic/data/:denom/create`, async (req, res) => {
       const { denom } = req.params
       const { mnemonic, key, value } = req.body
 
@@ -240,7 +240,7 @@ export class StorageController {
       })
     })
 
-    this.router.post(`${prefix}/privateKey/key/:denom/create`, async (req, res) => {
+    this.router.post(`${prefix}/privateKey/data/:denom/create`, async (req, res) => {
       const { denom } = req.params
       const { privateKey, key, value } = req.body
 
@@ -271,7 +271,7 @@ export class StorageController {
       })
     })
 
-    this.router.put(`${prefix}/mnemonic/key/:denom/update`, async (req, res) => {
+    this.router.put(`${prefix}/mnemonic/data/:denom/update`, async (req, res) => {
       const { denom } = req.params
       const { mnemonic, key, value } = req.body
 
@@ -302,7 +302,7 @@ export class StorageController {
       })
     })
 
-    this.router.put(`${prefix}/privateKey/key/:denom/update`, async (req, res) => {
+    this.router.put(`${prefix}/privateKey/data/:denom/update`, async (req, res) => {
       const { denom } = req.params
       const { privateKey, key, value } = req.body
 
@@ -333,7 +333,7 @@ export class StorageController {
       })
     })
 
-    this.router.delete(`${prefix}/mnemonic/key/:denom/delete`, async (req, res) => {
+    this.router.delete(`${prefix}/mnemonic/data/:denom/delete`, async (req, res) => {
       const { denom } = req.params
       const { mnemonic, key, value } = req.body
 
@@ -364,7 +364,7 @@ export class StorageController {
       })
     })
 
-    this.router.delete(`${prefix}/privateKey/key/:denom/delete`, async (req, res) => {
+    this.router.delete(`${prefix}/privateKey/data/:denom/delete`, async (req, res) => {
       const { denom } = req.params
       const { privateKey, key, value } = req.body
 
