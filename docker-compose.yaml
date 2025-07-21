@@ -1,0 +1,127 @@
+version: '3.8'
+
+networks:
+  release-network:
+    name: release-network
+
+services:
+  seed-node:
+    image: released:1.0.1
+    container_name: seed-node
+    ports:
+      - "26656:26656"  # P2P PORT
+      - "26657:26657"  # RPC PORT
+      - "1317:1317"    # REST API PORT
+      - "9090:9090"    # gRPC PORT
+    volumes:
+      - ./docker/validator1:/root/.release
+    networks:
+      - release-network
+    environment:
+      CHAIN_ID: "release-chain"
+      MONIKER: "validator"
+      KEYRING_BACKEND: "test"
+      BLOCKCHAIN_HOME: "/root/.release"
+      MINIMUM_GAS_PRICES: "0stake"
+    command: >
+      sh -c "
+        echo '🔧 Env Check...'
+        echo 'CHAIN_ID: '$${CHAIN_ID}
+        echo 'MONIKER: '$${MONIKER}
+        echo 'BLOCKCHAIN_HOME: '$${BLOCKCHAIN_HOME}
+        echo 'KEYRING_BACKEND: '$${KEYRING_BACKEND}
+        echo 'MINIMUM_GAS_PRICES: '$${MINIMUM_GAS_PRICES}
+        
+        if ! command -v ./released &> /dev/null; then
+          echo '❌ released Not Found Binary File'
+          echo 'Binaries:'
+          ls -la /usr/local/bin/ || ls -la /usr/bin/ || echo 'Not Found Binary File'
+          exit 1
+        fi
+        
+        echo '🚀 Node Starting...'
+        exec ./released start --home $${BLOCKCHAIN_HOME} --pruning=nothing --rpc.unsafe --log_level info --minimum-gas-prices=$${MINIMUM_GAS_PRICES}
+      "
+    
+  # Alice 검증자
+  validator2:
+    image: released:1.0.1
+    container_name: validator2
+    ports:
+      - "26666:26656"
+      - "26667:26657"
+      - "1327:1317"
+      - "9080:9090"
+    volumes:
+      - ./docker/validator2:/root/.release
+    networks:
+      - release-network
+    environment:
+      CHAIN_ID: "release-chain"
+      MONIKER: "validator2"
+      KEYRING_BACKEND: "test"
+      BLOCKCHAIN_HOME: "/root/.release"
+      MINIMUM_GAS_PRICES: "0stake"
+    depends_on:
+      - seed-node
+    command: >
+      sh -c "
+        echo '🔧 Env Check...'
+        echo 'CHAIN_ID: '$${CHAIN_ID}
+        echo 'MONIKER: '$${MONIKER}
+        echo 'BLOCKCHAIN_HOME: '$${BLOCKCHAIN_HOME}
+        echo 'KEYRING_BACKEND: '$${KEYRING_BACKEND}
+        echo 'MINIMUM_GAS_PRICES: '$${MINIMUM_GAS_PRICES}
+        
+        if ! command -v ./released &> /dev/null; then
+          echo '❌ released Not Found Binary File'
+          echo 'Binaries:'
+          ls -la /usr/local/bin/ || ls -la /usr/bin/ || echo 'Not Found Binary File'
+          exit 1
+        fi
+        
+        echo '🚀 Node Starting...'
+        exec ./released start --home $${BLOCKCHAIN_HOME} --pruning=nothing --rpc.unsafe --log_level info --minimum-gas-prices=$${MINIMUM_GAS_PRICES}
+      "
+
+  # Bob 검증자
+  validator3:
+    image: released:1.0.1
+    container_name: validator3
+    ports:
+      - "26686:26656"
+      - "26687:26657"
+      - "1347:1317"
+      - "9071:9090"
+    volumes:
+      - ./docker/validator3:/root/.release
+    networks:
+      - release-network
+    environment:
+      CHAIN_ID: "release-chain"
+      MONIKER: "validator3"
+      KEYRING_BACKEND: "test"
+      BLOCKCHAIN_HOME: "/root/.release"
+      MINIMUM_GAS_PRICES: "0stake"
+    depends_on:
+      - seed-node
+      - validator2
+    command: >
+      sh -c "
+        echo '🔧 Env Check...'
+        echo 'CHAIN_ID: '$${CHAIN_ID}
+        echo 'MONIKER: '$${MONIKER}
+        echo 'BLOCKCHAIN_HOME: '$${BLOCKCHAIN_HOME}
+        echo 'KEYRING_BACKEND: '$${KEYRING_BACKEND}
+        echo 'MINIMUM_GAS_PRICES: '$${MINIMUM_GAS_PRICES}
+        
+        if ! command -v ./released &> /dev/null; then
+          echo '❌ released Not Found Binary File'
+          echo 'Binaries:'
+          ls -la /usr/local/bin/ || ls -la /usr/bin/ || echo 'Not Found Binary File'
+          exit 1
+        fi
+        
+        echo '🚀 Node Starting...'
+        exec ./released start --home $${BLOCKCHAIN_HOME} --pruning=nothing --rpc.unsafe --log_level info --minimum-gas-prices=$${MINIMUM_GAS_PRICES}
+      "
