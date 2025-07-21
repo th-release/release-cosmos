@@ -28,6 +28,30 @@ func (k msgServer) CreateToken(ctx context.Context, msg *types.MsgCreateToken) (
 		return nil, errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "index already set")
 	}
 
+	if msg.TotalSupply < 1 {
+		return nil, errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "totalSupply < 1 error")
+	}
+
+	if msg.Decimals < 1 {
+		return nil, errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "decimals < 1 error")
+	}
+
+	if msg.Decimals > 12 {
+		return nil, errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "decimals > 12 error")
+	}
+
+	if msg.InitialPrice < 0 {
+		return nil, errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "InitialPrice < 0 error")
+	}
+
+	if len(msg.Symbol) < 3 {
+		return nil, errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "symbol length < 3 error")
+	}
+
+	if len(msg.Symbol) > 4 {
+		return nil, errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "symbol length > 4 error")
+	}
+
 	var token = types.Token{
 		Owner:        msg.Owner,
 		Denom:        encrypt_denom,
@@ -35,7 +59,7 @@ func (k msgServer) CreateToken(ctx context.Context, msg *types.MsgCreateToken) (
 		Symbol:       msg.Symbol,
 		MetadataUrl:  msg.MetadataUrl,
 		TotalSupply:  msg.TotalSupply,
-		Supply:       msg.Supply,
+		Supply:       0,
 		Decimals:     msg.Decimals,
 		InitialPrice: msg.InitialPrice,
 	}
@@ -67,16 +91,28 @@ func (k msgServer) UpdateToken(ctx context.Context, msg *types.MsgUpdateToken) (
 		return nil, errorsmod.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
 	}
 
+	if msg.TotalSupply < 1 {
+		return nil, errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "totalSupply < 1 error")
+	}
+
+	if msg.Decimals < 1 {
+		return nil, errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "decimals < 1 error")
+	}
+
+	if msg.InitialPrice < 0 {
+		return nil, errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "InitialPrice < 0 error")
+	}
+
 	var token = types.Token{
 		Owner:        msg.Owner,
 		Denom:        msg.Denom,
-		Name:         msg.Name,
-		Symbol:       msg.Symbol,
+		Name:         val.Name,
+		Symbol:       val.Symbol,
 		MetadataUrl:  msg.MetadataUrl,
 		TotalSupply:  msg.TotalSupply,
-		Supply:       msg.Supply,
-		Decimals:     msg.Decimals,
-		InitialPrice: msg.InitialPrice,
+		Supply:       val.Supply,
+		Decimals:     val.Decimals,
+		InitialPrice: val.InitialPrice,
 	}
 
 	if err := k.Token.Set(ctx, token.Denom, token); err != nil {
