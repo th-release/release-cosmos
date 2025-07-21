@@ -2,8 +2,9 @@ import * as express from 'express';
 import { AppController } from './app/app.controller';
 import { WalletController } from './wallet/wallet.controller';
 import { StorageController } from './storage/storage.controller';
+import { CurrencyController } from './currency/currency.controller';
 
-const controllers = [new AppController('/'), new WalletController('/wallet'), new StorageController("/storage")]
+const controllers = [new AppController('/'), new WalletController('/wallet'), new StorageController("/storage"), new CurrencyController("/currency")]
 
 export default class App {
   public router: express.Application;
