@@ -13,7 +13,7 @@ Cosmos SDK version:             v0.53.0
 0. docker build
     * `docker build -t released:lastest .`
 
-1. docker compose -f init-compose.yaml up
+1. node init
     * Make a note of the node IDs in the log.
 
 2. file update
