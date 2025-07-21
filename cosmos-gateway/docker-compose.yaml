@@ -1,0 +1,20 @@
+services:
+  gateway:
+    image: release-gateway:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      PORT: 3000
+      RPC_ENDPOINT: "http://seed-boot:26657"
+      ADDRESS_PREFIX: "release"
+      DENOM: "stake"
+      GAS_FEE: "0stake"
+    networks:
+      - release-network
+
+networks:
+  release-network:
+    name: release-network
