@@ -5,6 +5,7 @@ vue/dist
 /.idea/
 /.vscode/
 /.DS_Store
+/docker
 *.dot
 *.log
 *.ign
