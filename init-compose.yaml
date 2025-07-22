@@ -20,7 +20,7 @@ services:
     environment:
       CHAIN_ID: "release-chain"
       MONIKER: "validator"
-      KEYRING_BACKEND: "test"
+      KEYRING_BACKEND: "os"
       BLOCKCHAIN_HOME: "/root/.release"
       MINIMUM_GAS_PRICES: "0stake"
     command: >
@@ -112,7 +112,7 @@ services:
     environment:
       CHAIN_ID: "release-chain"
       MONIKER: "validator2"
-      KEYRING_BACKEND: "test"
+      KEYRING_BACKEND: "os"
       BLOCKCHAIN_HOME: "/root/.release"
       MINIMUM_GAS_PRICES: "0stake"
     command: >
@@ -170,7 +170,7 @@ services:
     environment:
       CHAIN_ID: "release-chain"
       MONIKER: "validator3"
-      KEYRING_BACKEND: "test"
+      KEYRING_BACKEND: "os"
       BLOCKCHAIN_HOME: "/root/.release"
       MINIMUM_GAS_PRICES: "0stake"
     command: >
