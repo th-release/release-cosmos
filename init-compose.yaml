@@ -20,7 +20,7 @@ services:
     environment:
       CHAIN_ID: "release-chain"
       MONIKER: "validator"
-      KEYRING_BACKEND: "os"
+      KEYRING_PASSPHRASE: "password1234"
       BLOCKCHAIN_HOME: "/root/.release"
       MINIMUM_GAS_PRICES: "0stake"
     command: >
@@ -29,7 +29,6 @@ services:
         echo 'CHAIN_ID: '$${CHAIN_ID}
         echo 'MONIKER: '$${MONIKER}
         echo 'BLOCKCHAIN_HOME: '$${BLOCKCHAIN_HOME}
-        echo 'KEYRING_BACKEND: '$${KEYRING_BACKEND}
         echo 'MINIMUM_GAS_PRICES: '$${MINIMUM_GAS_PRICES}
         
         if ! command -v ./released &> /dev/null; then
@@ -39,24 +38,36 @@ services:
           exit 1
         fi
         
-        mkdir -p $${BLOCKCHAIN_HOME}
+        mkdir -p $${BLOCKCHAIN_HOME}/config/gentx
         
         if [ ! -f $${BLOCKCHAIN_HOME}/config/genesis.json ]; then
           echo '🔧 Node Init...'
           
           ./released init $${MONIKER} --chain-id $${CHAIN_ID} --home $${BLOCKCHAIN_HOME}
-          
-          echo 'y' | ./released keys add validator --keyring-backend $${KEYRING_BACKEND} --home $${BLOCKCHAIN_HOME} || echo 'Key Generate Failed'
-          
-          ./released genesis add-genesis-account validator 1000000000stake --keyring-backend $${KEYRING_BACKEND} --home $${BLOCKCHAIN_HOME}
 
-          echo 'y' | ./released keys add validator2 --keyring-backend $${KEYRING_BACKEND} --home $${BLOCKCHAIN_HOME} || echo 'Key Generate Failed'
-          echo 'y' | ./released keys add validator3 --keyring-backend $${KEYRING_BACKEND} --home $${BLOCKCHAIN_HOME} || echo 'Key Generate Failed'
+          # 키 생성 (임시 파일 방식)
+          echo '$${KEYRING_PASSPHRASE}' > /tmp/pass1 && echo '$${KEYRING_PASSPHRASE}' >> /tmp/pass1
+          ./released keys add validator --keyring-backend file --home $${BLOCKCHAIN_HOME} < /tmp/pass1 > /tmp/validator 2>&1
+          rm -f /tmp/pass1
           
-          ./released genesis add-genesis-account validator2 1000000000stake --keyring-backend $${KEYRING_BACKEND} --home $${BLOCKCHAIN_HOME}
-          ./released genesis add-genesis-account validator3 1000000000stake --keyring-backend $${KEYRING_BACKEND} --home $${BLOCKCHAIN_HOME}
+          # genesis account 추가
+          echo '$${KEYRING_PASSPHRASE}' | ./released genesis add-genesis-account validator 1000000000stake --keyring-backend file --home $${BLOCKCHAIN_HOME}
 
-          ./released genesis gentx validator 100000000stake --chain-id $${CHAIN_ID} --keyring-backend $${KEYRING_BACKEND} --home $${BLOCKCHAIN_HOME}
+          # validator2, validator3 키 생성
+          echo '$${KEYRING_PASSPHRASE}' > /tmp/pass2 && echo '$${KEYRING_PASSPHRASE}' >> /tmp/pass2
+          ./released keys add validator2 --keyring-backend file --home $${BLOCKCHAIN_HOME} < /tmp/pass2 > /tmp/validator2 2>&1
+          rm -f /tmp/pass2
+
+          echo '$${KEYRING_PASSPHRASE}' > /tmp/pass3 && echo '$${KEYRING_PASSPHRASE}' >> /tmp/pass3
+          ./released keys add validator3 --keyring-backend file --home $${BLOCKCHAIN_HOME} < /tmp/pass3 > /tmp/validator3 2>&1
+          rm -f /tmp/pass3
+          
+          # genesis account 추가
+          echo '$${KEYRING_PASSPHRASE}' | ./released genesis add-genesis-account validator2 1000000000stake --keyring-backend file --home $${BLOCKCHAIN_HOME}
+          echo '$${KEYRING_PASSPHRASE}' | ./released genesis add-genesis-account validator3 1000000000stake --keyring-backend file --home $${BLOCKCHAIN_HOME}
+
+          # gentx 생성
+          echo '$${KEYRING_PASSPHRASE}' | ./released genesis gentx validator 100000000stake --chain-id $${CHAIN_ID} --keyring-backend file --home $${BLOCKCHAIN_HOME}
           
           ./released genesis collect-gentxs --home $${BLOCKCHAIN_HOME}
           
@@ -92,7 +103,26 @@ services:
         else
           echo '❌ Not Found config.toml'
         fi
+
+        echo '======================= validators ======================='
+
+        echo '$${KEYRING_PASSPHRASE}' | ./released keys list --keyring-backend file --home $${BLOCKCHAIN_HOME}        
+
+        echo '======================= validator ======================='
+
+        cat /tmp/validator
         
+        echo '======================= validator2 ======================='
+
+        cat /tmp/validator2
+        
+        echo '======================= validator3 ======================='
+
+        cat /tmp/validator3
+        
+        echo '=========================================================='
+
+
         echo '🚀 Node Ready!'
       "
     
@@ -112,9 +142,10 @@ services:
     environment:
       CHAIN_ID: "release-chain"
       MONIKER: "validator2"
-      KEYRING_BACKEND: "os"
+      KEYRING_PASSPHRASE: "password1234"
       BLOCKCHAIN_HOME: "/root/.release"
       MINIMUM_GAS_PRICES: "0stake"
+      
     command: >
       sh -c "
         echo 'validator2 start'
@@ -122,7 +153,6 @@ services:
         echo 'CHAIN_ID: '$${CHAIN_ID}
         echo 'MONIKER: '$${MONIKER}
         echo 'BLOCKCHAIN_HOME: '$${BLOCKCHAIN_HOME}
-        echo 'KEYRING_BACKEND: '$${KEYRING_BACKEND}
         echo 'MINIMUM_GAS_PRICES: '$${MINIMUM_GAS_PRICES}
         
         mkdir -p $${BLOCKCHAIN_HOME}
@@ -170,9 +200,12 @@ services:
     environment:
       CHAIN_ID: "release-chain"
       MONIKER: "validator3"
-      KEYRING_BACKEND: "os"
+      KEYRING_PASSPHRASE: "password1234"
       BLOCKCHAIN_HOME: "/root/.release"
       MINIMUM_GAS_PRICES: "0stake"
+    depends_on:
+      - seed-node
+      - validator2
     command: >
       sh -c "
         echo 'validator3 검증자 시작'
@@ -180,7 +213,6 @@ services:
         echo 'CHAIN_ID: '$${CHAIN_ID}
         echo 'MONIKER: '$${MONIKER}
         echo 'BLOCKCHAIN_HOME: '$${BLOCKCHAIN_HOME}
-        echo 'KEYRING_BACKEND: '$${KEYRING_BACKEND}
         echo 'MINIMUM_GAS_PRICES: '$${MINIMUM_GAS_PRICES}
 
         mkdir -p $${BLOCKCHAIN_HOME}

@@ -20,7 +20,6 @@ services:
     environment:
       CHAIN_ID: "release-chain"
       MONIKER: "validator"
-      KEYRING_BACKEND: "os"
       BLOCKCHAIN_HOME: "/root/.release"
       MINIMUM_GAS_PRICES: "0stake"
     command: >
@@ -29,7 +28,6 @@ services:
         echo 'CHAIN_ID: '$${CHAIN_ID}
         echo 'MONIKER: '$${MONIKER}
         echo 'BLOCKCHAIN_HOME: '$${BLOCKCHAIN_HOME}
-        echo 'KEYRING_BACKEND: '$${KEYRING_BACKEND}
         echo 'MINIMUM_GAS_PRICES: '$${MINIMUM_GAS_PRICES}
         
         if ! command -v ./released &> /dev/null; then
@@ -59,7 +57,6 @@ services:
     environment:
       CHAIN_ID: "release-chain"
       MONIKER: "validator2"
-      KEYRING_BACKEND: "os"
       BLOCKCHAIN_HOME: "/root/.release"
       MINIMUM_GAS_PRICES: "0stake"
     depends_on:
@@ -70,7 +67,6 @@ services:
         echo 'CHAIN_ID: '$${CHAIN_ID}
         echo 'MONIKER: '$${MONIKER}
         echo 'BLOCKCHAIN_HOME: '$${BLOCKCHAIN_HOME}
-        echo 'KEYRING_BACKEND: '$${KEYRING_BACKEND}
         echo 'MINIMUM_GAS_PRICES: '$${MINIMUM_GAS_PRICES}
         
         if ! command -v ./released &> /dev/null; then
@@ -100,7 +96,6 @@ services:
     environment:
       CHAIN_ID: "release-chain"
       MONIKER: "validator3"
-      KEYRING_BACKEND: "os"
       BLOCKCHAIN_HOME: "/root/.release"
       MINIMUM_GAS_PRICES: "0stake"
     depends_on:
@@ -112,7 +107,6 @@ services:
         echo 'CHAIN_ID: '$${CHAIN_ID}
         echo 'MONIKER: '$${MONIKER}
         echo 'BLOCKCHAIN_HOME: '$${BLOCKCHAIN_HOME}
-        echo 'KEYRING_BACKEND: '$${KEYRING_BACKEND}
         echo 'MINIMUM_GAS_PRICES: '$${MINIMUM_GAS_PRICES}
         
         if ! command -v ./released &> /dev/null; then
