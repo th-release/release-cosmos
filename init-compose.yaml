@@ -179,7 +179,7 @@ services:
         fi
 
         NODE_ID=$$(./released comet show-node-id --home $${BLOCKCHAIN_HOME})
-        echo '📋 SEED NODE ID: '$${NODE_ID}
+        echo '📋 Validator2 NODE ID: '$${NODE_ID}
         echo '🔗 Connect Information: '$${NODE_ID}'@validator2:26656'
         echo '🚀 validator2 validator2 Ready!'
       "
@@ -239,7 +239,7 @@ services:
         fi
         
         NODE_ID=$$(./released comet show-node-id --home $${BLOCKCHAIN_HOME})
-        echo '📋 SEED NODE ID: '$${NODE_ID}
+        echo '📋 Validator3 NODE ID: '$${NODE_ID}
         echo '🔗 Connect Information: '$${NODE_ID}'@validator3:26656'
         echo '🚀 validator3 validator2 Ready!'
       "
