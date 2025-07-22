@@ -102,7 +102,7 @@ services:
           sed -i.bak 's/allow_duplicate_ip = false/allow_duplicate_ip = true/g' $${BLOCKCHAIN_HOME}/config/config.toml
 
           sed -i.bak 's/create_empty_blocks = true/create_empty_blocks = false/g' $${BLOCKCHAIN_HOME}/config/config.toml
-          sed -i.bak 's/create_empty_blocks_interval = "0s"/create_empty_blocks_interval = "24h"/g' $${BLOCKCHAIN_HOME}/config/config.toml
+          sed -i.bak 's/create_empty_blocks_interval = \"0s\"/create_empty_blocks_interval = \"24h\"/g' $${BLOCKCHAIN_HOME}/config/config.toml
         else
           echo '❌ Not Found config.toml'
         fi
@@ -181,7 +181,7 @@ services:
           sed -i.bak 's/allow_duplicate_ip = false/allow_duplicate_ip = true/g' $${BLOCKCHAIN_HOME}/config/config.toml    
 
           sed -i.bak 's/create_empty_blocks = true/create_empty_blocks = false/g' $${BLOCKCHAIN_HOME}/config/config.toml
-          sed -i.bak 's/create_empty_blocks_interval = "0s"/create_empty_blocks_interval = "24h"/g' $${BLOCKCHAIN_HOME}/config/config.toml   
+          sed -i.bak 's/create_empty_blocks_interval = \"0s\"/create_empty_blocks_interval = \"24h\"/g' $${BLOCKCHAIN_HOME}/config/config.toml   
         fi
 
         NODE_ID=$$(./released comet show-node-id --home $${BLOCKCHAIN_HOME})
@@ -244,7 +244,7 @@ services:
           sed -i.bak 's/allow_duplicate_ip = false/allow_duplicate_ip = true/g' $${BLOCKCHAIN_HOME}/config/config.toml
           
           sed -i.bak 's/create_empty_blocks = true/create_empty_blocks = false/g' $${BLOCKCHAIN_HOME}/config/config.toml
-          sed -i.bak 's/create_empty_blocks_interval = "0s"/create_empty_blocks_interval = "24h"/g' $${BLOCKCHAIN_HOME}/config/config.toml
+          sed -i.bak 's/create_empty_blocks_interval = \"0s\"/create_empty_blocks_interval = \"24h\"/g' $${BLOCKCHAIN_HOME}/config/config.toml
           
         fi
         
