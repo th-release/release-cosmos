@@ -6,7 +6,7 @@ networks:
 
 services:
   seed-node:
-    image: released:1.0.1
+    image: released:latest
     container_name: seed-node
     ports:
       - "26656:26656"  # P2P PORT
@@ -45,7 +45,7 @@ services:
     
   # Alice 검증자
   validator2:
-    image: released:1.0.1
+    image: released:latest
     container_name: validator2
     ports:
       - "26666:26656"
@@ -86,7 +86,7 @@ services:
 
   # Bob 검증자
   validator3:
-    image: released:1.0.1
+    image: released:latest
     container_name: validator3
     ports:
       - "26686:26656"
