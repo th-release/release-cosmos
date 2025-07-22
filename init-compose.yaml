@@ -208,8 +208,8 @@ services:
       - validator2
     command: >
       sh -c "
-        echo 'validator3 검증자 시작'
-        echo '🔧 validator3 환경변수 확인...'
+        echo 'validator3 Start'
+        echo '🔧 validator3 Env Check...'
         echo 'CHAIN_ID: '$${CHAIN_ID}
         echo 'MONIKER: '$${MONIKER}
         echo 'BLOCKCHAIN_HOME: '$${BLOCKCHAIN_HOME}
