@@ -1,0 +1,255 @@
+version: '3.8'
+
+networks:
+  release-network:
+    name: release-network
+
+services:
+  seed-node:
+    image: released:latest
+    container_name: seed-node
+    ports:
+      - "26656:26656"  # P2P PORT
+      - "26657:26657"  # RPC PORT
+      - "1317:1317"    # REST API PORT
+      - "9090:9090"    # gRPC PORT
+    volumes:
+      - ./docker/validator1:/root/.release
+      - ./docker/tmps/:/tmp/
+    networks:
+      - release-network
+    environment:
+      CHAIN_ID: "release-chain"
+      MONIKER: "validator"
+      KEYRING_PASSPHRASE: "password1234"
+      BLOCKCHAIN_HOME: "/root/.release"
+      MINIMUM_GAS_PRICES: "0stake"
+    command: >
+      sh -c "
+        echo '🔧 Env Check...'
+        echo 'CHAIN_ID: '$${CHAIN_ID}
+        echo 'MONIKER: '$${MONIKER}
+        echo 'BLOCKCHAIN_HOME: '$${BLOCKCHAIN_HOME}
+        echo 'MINIMUM_GAS_PRICES: '$${MINIMUM_GAS_PRICES}
+        
+        if ! command -v ./released &> /dev/null; then
+          echo '❌ released Not Found Binary File'
+          echo 'Binaries:'
+          ls -la /usr/local/bin/ || ls -la /usr/bin/ || echo 'Not Found Binary File'
+          exit 1
+        fi
+        
+        mkdir -p $${BLOCKCHAIN_HOME}/config/gentx
+        
+        if [ ! -f $${BLOCKCHAIN_HOME}/config/genesis.json ]; then
+          echo '🔧 Node Init...'
+          
+          ./released init $${MONIKER} --chain-id $${CHAIN_ID} --home $${BLOCKCHAIN_HOME}
+
+          # 키 생성 (임시 파일 방식)
+          echo '$${KEYRING_PASSPHRASE}' > /tmp/pass1 && echo '$${KEYRING_PASSPHRASE}' >> /tmp/pass1
+          ./released keys add validator --keyring-backend file --home $${BLOCKCHAIN_HOME} < /tmp/pass1 > /tmp/validator 2>&1
+          rm -f /tmp/pass1
+          
+          # genesis account 추가
+          echo '$${KEYRING_PASSPHRASE}' | ./released genesis add-genesis-account validator 1000000000stake --keyring-backend file --home $${BLOCKCHAIN_HOME}
+
+          # validator2, validator3 키 생성
+          echo '$${KEYRING_PASSPHRASE}' > /tmp/pass2 && echo '$${KEYRING_PASSPHRASE}' >> /tmp/pass2
+          ./released keys add validator2 --keyring-backend file --home $${BLOCKCHAIN_HOME} < /tmp/pass2 > /tmp/validator2 2>&1
+          rm -f /tmp/pass2
+
+          echo '$${KEYRING_PASSPHRASE}' > /tmp/pass3 && echo '$${KEYRING_PASSPHRASE}' >> /tmp/pass3
+          ./released keys add validator3 --keyring-backend file --home $${BLOCKCHAIN_HOME} < /tmp/pass3 > /tmp/validator3 2>&1
+          rm -f /tmp/pass3
+          
+          # genesis account 추가
+          echo '$${KEYRING_PASSPHRASE}' | ./released genesis add-genesis-account validator2 1000000000stake --keyring-backend file --home $${BLOCKCHAIN_HOME}
+          echo '$${KEYRING_PASSPHRASE}' | ./released genesis add-genesis-account validator3 1000000000stake --keyring-backend file --home $${BLOCKCHAIN_HOME}
+
+          # gentx 생성
+          echo '$${KEYRING_PASSPHRASE}' | ./released genesis gentx validator 100000000stake --chain-id $${CHAIN_ID} --keyring-backend file --home $${BLOCKCHAIN_HOME}
+          
+          ./released genesis collect-gentxs --home $${BLOCKCHAIN_HOME}
+          
+          echo '✅ Node Init'
+
+          NODE_ID=$$(./released comet show-node-id --home $${BLOCKCHAIN_HOME})
+          echo '📋 SEED NODE ID: '$${NODE_ID}
+          echo '🔗 Connect Information: '$${NODE_ID}'@seed-node:26656'
+        else
+          echo '✅ Node Inited, Skip'
+          NODE_ID=$$(./released comet show-node-id --home $${BLOCKCHAIN_HOME})
+          echo '📋 SEED NODE ID: '$${NODE_ID}
+          echo '🔗 Connect Information: '$${NODE_ID}'@seed-node:26656'
+        fi
+        
+        if [ -f $${BLOCKCHAIN_HOME}/config/app.toml ]; then
+          echo '🔧 app.toml Setting...'
+          sed -i.bak 's/minimum-gas-prices = \"\"/minimum-gas-prices = \"'$${MINIMUM_GAS_PRICES}'\"/g' $${BLOCKCHAIN_HOME}/config/app.toml
+          sed -i.bak 's/enable = false/enable = true/g' $${BLOCKCHAIN_HOME}/config/app.toml
+          sed -i.bak 's/enabled-unsafe-cors = false/enabled-unsafe-cors = true/g' $${BLOCKCHAIN_HOME}/config/app.toml
+        else
+          echo '❌ Not Found app.toml'
+        fi
+        
+        if [ -f $${BLOCKCHAIN_HOME}/config/config.toml ]; then
+          echo '🔧 config.toml Setting...'
+          sed -i.bak 's#laddr = \"tcp://127.0.0.1:26657\"#laddr = \"tcp://0.0.0.0:26657\"#g' $${BLOCKCHAIN_HOME}/config/config.toml
+          sed -i.bak 's/cors_allowed_origins = \[\]/cors_allowed_origins = \[\"*\"\]/g' $${BLOCKCHAIN_HOME}/config/config.toml
+
+          sed -i.bak 's#laddr = \"tcp://0.0.0.0:26656\"#laddr = \"tcp://0.0.0.0:26656\"#g' $${BLOCKCHAIN_HOME}/config/config.toml
+          sed -i.bak 's/addr_book_strict = true/addr_book_strict = false/g' $${BLOCKCHAIN_HOME}/config/config.toml
+          sed -i.bak 's/allow_duplicate_ip = false/allow_duplicate_ip = true/g' $${BLOCKCHAIN_HOME}/config/config.toml
+
+          sed -i.bak 's/create_empty_blocks = true/create_empty_blocks = false/g' $${BLOCKCHAIN_HOME}/config/config.toml
+          sed -i.bak 's/create_empty_blocks_interval = \"0s\"/create_empty_blocks_interval = \"60s\"/g' $${BLOCKCHAIN_HOME}/config/config.toml
+        else
+          echo '❌ Not Found config.toml'
+        fi
+
+        echo '======================= validators ======================='
+
+        echo '$${KEYRING_PASSPHRASE}' | ./released keys list --keyring-backend file --home $${BLOCKCHAIN_HOME}        
+
+        echo '======================= validator ======================='
+
+        cat /tmp/validator
+        
+        echo '======================= validator2 ======================='
+
+        cat /tmp/validator2
+        
+        echo '======================= validator3 ======================='
+
+        cat /tmp/validator3
+        
+        echo '=========================================================='
+
+
+        echo '🚀 Node Ready!'
+      "
+    
+  # Alice 검증자
+  validator2:
+    image: released:latest
+    container_name: validator2
+    ports:
+      - "26666:26656"
+      - "26667:26657"
+      - "1327:1317"
+      - "9080:9090"
+    volumes:
+      - ./docker/validator2:/root/.release
+    networks:
+      - release-network
+    environment:
+      CHAIN_ID: "release-chain"
+      MONIKER: "validator2"
+      KEYRING_PASSPHRASE: "password1234"
+      BLOCKCHAIN_HOME: "/root/.release"
+      MINIMUM_GAS_PRICES: "0stake"
+      
+    command: >
+      sh -c "
+        echo 'validator2 start'
+        echo '🔧 validator2 env check...'
+        echo 'CHAIN_ID: '$${CHAIN_ID}
+        echo 'MONIKER: '$${MONIKER}
+        echo 'BLOCKCHAIN_HOME: '$${BLOCKCHAIN_HOME}
+        echo 'MINIMUM_GAS_PRICES: '$${MINIMUM_GAS_PRICES}
+        
+        mkdir -p $${BLOCKCHAIN_HOME}
+
+        if [ ! -f $${BLOCKCHAIN_HOME}/config/genesis.json ]; then
+          echo '🔧 validator2 initing..'
+          ./released init $${MONIKER} --chain-id $${CHAIN_ID} --home $${BLOCKCHAIN_HOME}
+
+          echo '✅ validator2 init!'
+        fi
+        
+        if [ -f $${BLOCKCHAIN_HOME}/config/app.toml ]; then
+          sed -i.bak 's/minimum-gas-prices = \"\"/minimum-gas-prices = \"'$${MINIMUM_GAS_PRICES}'\"/g' $${BLOCKCHAIN_HOME}/config/app.toml
+          sed -i.bak 's/enable = false/enable = true/g' $${BLOCKCHAIN_HOME}/config/app.toml
+          sed -i.bak 's/enabled-unsafe-cors = false/enabled-unsafe-cors = true/g' $${BLOCKCHAIN_HOME}/config/app.toml
+        fi
+        
+        if [ -f $${BLOCKCHAIN_HOME}/config/config.toml ]; then
+          sed -i.bak 's#laddr = \"tcp://127.0.0.1:26657\"#laddr = \"tcp://0.0.0.0:26657\"#g' $${BLOCKCHAIN_HOME}/config/config.toml
+          sed -i.bak 's/cors_allowed_origins = \[\]/cors_allowed_origins = \[\"*\"\]/g' $${BLOCKCHAIN_HOME}/config/config.toml
+          
+          sed -i.bak 's/addr_book_strict = true/addr_book_strict = false/g' $${BLOCKCHAIN_HOME}/config/config.toml
+          sed -i.bak 's/allow_duplicate_ip = false/allow_duplicate_ip = true/g' $${BLOCKCHAIN_HOME}/config/config.toml    
+
+          sed -i.bak 's/create_empty_blocks = true/create_empty_blocks = false/g' $${BLOCKCHAIN_HOME}/config/config.toml
+          sed -i.bak 's/create_empty_blocks_interval = \"0s\"/create_empty_blocks_interval = \"60s\"/g' $${BLOCKCHAIN_HOME}/config/config.toml   
+        fi
+
+        NODE_ID=$$(./released comet show-node-id --home $${BLOCKCHAIN_HOME})
+        echo '📋 Validator2 NODE ID: '$${NODE_ID}
+        echo '🔗 Connect Information: '$${NODE_ID}'@validator2:26656'
+        echo '🚀 validator2 validator2 Ready!'
+      "
+
+  # Bob 검증자
+  validator3:
+    image: released:latest
+    container_name: validator3
+    ports:
+      - "26686:26656"
+      - "26687:26657"
+      - "1347:1317"
+      - "9071:9090"
+    volumes:
+      - ./docker/validator3:/root/.release
+    networks:
+      - release-network
+    environment:
+      CHAIN_ID: "release-chain"
+      MONIKER: "validator3"
+      KEYRING_PASSPHRASE: "password1234"
+      BLOCKCHAIN_HOME: "/root/.release"
+      MINIMUM_GAS_PRICES: "0stake"
+    depends_on:
+      - seed-node
+      - validator2
+    command: >
+      sh -c "
+        echo 'validator3 Start'
+        echo '🔧 validator3 Env Check...'
+        echo 'CHAIN_ID: '$${CHAIN_ID}
+        echo 'MONIKER: '$${MONIKER}
+        echo 'BLOCKCHAIN_HOME: '$${BLOCKCHAIN_HOME}
+        echo 'MINIMUM_GAS_PRICES: '$${MINIMUM_GAS_PRICES}
+
+        mkdir -p $${BLOCKCHAIN_HOME}
+        
+        if [ ! -f $${BLOCKCHAIN_HOME}/config/genesis.json ]; then
+          echo '🔧 validator3 initing..'
+          
+          ./released init $${MONIKER} --chain-id $${CHAIN_ID} --home $${BLOCKCHAIN_HOME}
+          
+          echo '✅ validator3 init!'
+        fi
+        
+        if [ -f $${BLOCKCHAIN_HOME}/config/app.toml ]; then
+          sed -i.bak 's/minimum-gas-prices = \"\"/minimum-gas-prices = \"'$${MINIMUM_GAS_PRICES}'\"/g' $${BLOCKCHAIN_HOME}/config/app.toml
+          sed -i.bak 's/enable = false/enable = true/g' $${BLOCKCHAIN_HOME}/config/app.toml
+          sed -i.bak 's/enabled-unsafe-cors = false/enabled-unsafe-cors = true/g' $${BLOCKCHAIN_HOME}/config/app.toml
+        fi
+        
+        if [ -f $${BLOCKCHAIN_HOME}/config/config.toml ]; then
+          sed -i.bak 's#laddr = \"tcp://127.0.0.1:26657\"#laddr = \"tcp://0.0.0.0:26657\"#g' $${BLOCKCHAIN_HOME}/config/config.toml
+          sed -i.bak 's/cors_allowed_origins = \[\]/cors_allowed_origins = \[\"*\"\]/g' $${BLOCKCHAIN_HOME}/config/config.toml
+          sed -i.bak 's/addr_book_strict = true/addr_book_strict = false/g' $${BLOCKCHAIN_HOME}/config/config.toml
+          sed -i.bak 's/allow_duplicate_ip = false/allow_duplicate_ip = true/g' $${BLOCKCHAIN_HOME}/config/config.toml
+          
+          sed -i.bak 's/create_empty_blocks = true/create_empty_blocks = false/g' $${BLOCKCHAIN_HOME}/config/config.toml
+          sed -i.bak 's/create_empty_blocks_interval = \"0s\"/create_empty_blocks_interval = \"60s\"/g' $${BLOCKCHAIN_HOME}/config/config.toml
+        fi
+        
+        NODE_ID=$$(./released comet show-node-id --home $${BLOCKCHAIN_HOME})
+        echo '📋 Validator3 NODE ID: '$${NODE_ID}
+        echo '🔗 Connect Information: '$${NODE_ID}'@validator3:26656'
+        echo '🚀 validator3 validator2 Ready!'
+      "

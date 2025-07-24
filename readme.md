@@ -9,6 +9,20 @@ Ignite CLI config version:      v1
 Cosmos SDK version:             v0.53.0
 ```
 
+## How To Start (Docker)?
+0. docker build
+    * `docker build -t released:lastest .`
+
+1. node init
+    * Make a note of the node IDs in the log.
+
+2. file update
+    * Please copy docker/${seed-node}/config/genesis.json and over write each docker/${validators}/config/genesis.json with it
+    * Please modify the seeds = "" and persistent_peers = "" sections in each docker/${validators}/config/config.toml to the format {node_id}@{service}:{port}.
+    
+3. docker start
+    * `docker compose up -d`
+
 ## Get started
 
 ```

@@ -73,8 +73,9 @@ export class WalletController {
 
       const result = await this.walletService.sendWithMnemonic(mnemonic, toAddress, amount, memo, denom)
 
-      if (!result.success) 
+      if (!result.success) {
         return res.status(500).json(result)
+      }
 
       return res.status(200).json(result)
     });
