@@ -24,6 +24,7 @@ services:
       KEYRING_PASSPHRASE: "password1234"
       BLOCKCHAIN_HOME: "/root/.release"
       MINIMUM_GAS_PRICES: "0stake"
+      PRUNING_TYPE: "nothing"
     command: >
       sh -c "
         echo '🔧 Env Check...'
@@ -89,6 +90,7 @@ services:
           sed -i.bak 's/minimum-gas-prices = \"\"/minimum-gas-prices = \"'$${MINIMUM_GAS_PRICES}'\"/g' $${BLOCKCHAIN_HOME}/config/app.toml
           sed -i.bak 's/enable = false/enable = true/g' $${BLOCKCHAIN_HOME}/config/app.toml
           sed -i.bak 's/enabled-unsafe-cors = false/enabled-unsafe-cors = true/g' $${BLOCKCHAIN_HOME}/config/app.toml
+          sed -i.bak 's/pruning = \"default\"/pruning = \"'$${PRUNING_TYPE}'\"/g' $${BLOCKCHAIN_HOME}/config/app.toml
         else
           echo '❌ Not Found app.toml'
         fi
@@ -101,9 +103,6 @@ services:
           sed -i.bak 's#laddr = \"tcp://0.0.0.0:26656\"#laddr = \"tcp://0.0.0.0:26656\"#g' $${BLOCKCHAIN_HOME}/config/config.toml
           sed -i.bak 's/addr_book_strict = true/addr_book_strict = false/g' $${BLOCKCHAIN_HOME}/config/config.toml
           sed -i.bak 's/allow_duplicate_ip = false/allow_duplicate_ip = true/g' $${BLOCKCHAIN_HOME}/config/config.toml
-
-          sed -i.bak 's/create_empty_blocks = true/create_empty_blocks = false/g' $${BLOCKCHAIN_HOME}/config/config.toml
-          sed -i.bak 's/create_empty_blocks_interval = \"0s\"/create_empty_blocks_interval = \"60s\"/g' $${BLOCKCHAIN_HOME}/config/config.toml
         else
           echo '❌ Not Found config.toml'
         fi
@@ -149,7 +148,7 @@ services:
       KEYRING_PASSPHRASE: "password1234"
       BLOCKCHAIN_HOME: "/root/.release"
       MINIMUM_GAS_PRICES: "0stake"
-      
+      PRUNING_TYPE: "everything"
     command: >
       sh -c "
         echo 'validator2 start'
@@ -172,6 +171,7 @@ services:
           sed -i.bak 's/minimum-gas-prices = \"\"/minimum-gas-prices = \"'$${MINIMUM_GAS_PRICES}'\"/g' $${BLOCKCHAIN_HOME}/config/app.toml
           sed -i.bak 's/enable = false/enable = true/g' $${BLOCKCHAIN_HOME}/config/app.toml
           sed -i.bak 's/enabled-unsafe-cors = false/enabled-unsafe-cors = true/g' $${BLOCKCHAIN_HOME}/config/app.toml
+          sed -i.bak 's/pruning = \"default\"/pruning = \"'$${PRUNING_TYPE}'\"/g' $${BLOCKCHAIN_HOME}/config/app.toml
         fi
         
         if [ -f $${BLOCKCHAIN_HOME}/config/config.toml ]; then
@@ -180,9 +180,6 @@ services:
           
           sed -i.bak 's/addr_book_strict = true/addr_book_strict = false/g' $${BLOCKCHAIN_HOME}/config/config.toml
           sed -i.bak 's/allow_duplicate_ip = false/allow_duplicate_ip = true/g' $${BLOCKCHAIN_HOME}/config/config.toml    
-
-          sed -i.bak 's/create_empty_blocks = true/create_empty_blocks = false/g' $${BLOCKCHAIN_HOME}/config/config.toml
-          sed -i.bak 's/create_empty_blocks_interval = \"0s\"/create_empty_blocks_interval = \"60s\"/g' $${BLOCKCHAIN_HOME}/config/config.toml   
         fi
 
         NODE_ID=$$(./released comet show-node-id --home $${BLOCKCHAIN_HOME})
@@ -210,6 +207,7 @@ services:
       KEYRING_PASSPHRASE: "password1234"
       BLOCKCHAIN_HOME: "/root/.release"
       MINIMUM_GAS_PRICES: "0stake"
+      PRUNING_TYPE: "default"
     depends_on:
       - seed-node
       - validator2
@@ -236,6 +234,7 @@ services:
           sed -i.bak 's/minimum-gas-prices = \"\"/minimum-gas-prices = \"'$${MINIMUM_GAS_PRICES}'\"/g' $${BLOCKCHAIN_HOME}/config/app.toml
           sed -i.bak 's/enable = false/enable = true/g' $${BLOCKCHAIN_HOME}/config/app.toml
           sed -i.bak 's/enabled-unsafe-cors = false/enabled-unsafe-cors = true/g' $${BLOCKCHAIN_HOME}/config/app.toml
+          sed -i.bak 's/pruning = \"default\"/pruning = \"'$${PRUNING_TYPE}'\"/g' $${BLOCKCHAIN_HOME}/config/app.toml
         fi
         
         if [ -f $${BLOCKCHAIN_HOME}/config/config.toml ]; then
@@ -243,9 +242,6 @@ services:
           sed -i.bak 's/cors_allowed_origins = \[\]/cors_allowed_origins = \[\"*\"\]/g' $${BLOCKCHAIN_HOME}/config/config.toml
           sed -i.bak 's/addr_book_strict = true/addr_book_strict = false/g' $${BLOCKCHAIN_HOME}/config/config.toml
           sed -i.bak 's/allow_duplicate_ip = false/allow_duplicate_ip = true/g' $${BLOCKCHAIN_HOME}/config/config.toml
-          
-          sed -i.bak 's/create_empty_blocks = true/create_empty_blocks = false/g' $${BLOCKCHAIN_HOME}/config/config.toml
-          sed -i.bak 's/create_empty_blocks_interval = \"0s\"/create_empty_blocks_interval = \"60s\"/g' $${BLOCKCHAIN_HOME}/config/config.toml
         fi
         
         NODE_ID=$$(./released comet show-node-id --home $${BLOCKCHAIN_HOME})
